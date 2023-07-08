@@ -19,6 +19,8 @@ from qiling.os.uefi.protocols import EfiSmmAccess2Protocol
 from qiling.os.uefi.protocols import EfiSmmBase2Protocol
 from qiling.os.uefi.protocols import EfiSmmCpuProtocol
 from qiling.os.uefi.protocols import EfiSmmSwDispatch2Protocol
+from qiling.os.uefi.protocols import PcdProtocol
+from qiling.os.uefi.protocols import EfiFirmwareVolume2Protocol
 
 class QlLoaderPE_UEFI(QlLoader):
     def __init__(self, ql: Qiling):
@@ -118,6 +120,11 @@ class QlLoaderPE_UEFI(QlLoader):
             self.entry_point = entry_point
 
         self.install_loaded_image_protocol(image_base, image_size)
+        # TODO loading things like this seems not like it should be
+        #  look into whether EfiLoadedImageProtocol is always installed per Documentation when an image is loaded
+        #  (generally find out, when and where protocols should be installed)
+        #  then see where EfiFirmwareVolume2Protocol should be loaded respectively
+        self.context.install_protocol(EfiFirmwareVolume2Protocol.descriptor, image_base)
 
         # this would be used later be loader.find_containing_image
         self.images.append(Image(image_base, image_base + image_size, path))
@@ -256,7 +263,7 @@ class QlLoaderPE_UEFI(QlLoader):
 
         protocols = (
             EfiSmmAccess2Protocol,
-            EfiSmmBase2Protocol,
+            EfiSmmBase2Protocol
         )
 
         for p in protocols:
