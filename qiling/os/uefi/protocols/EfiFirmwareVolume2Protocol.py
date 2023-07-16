@@ -29,7 +29,6 @@ class EFI_FV_WRITE_FILE_DATA(STRUCT):
         ('BufferSize',          UINT32)
     ]
 
-# @see: MdePkg\Include\Protocol\MmAccess.h
 class EFI_FIRMWARE_VOLUME2_PROTOCOL(STRUCT):
     EFI_FIRMWARE_VOLUME2_PROTOCOL = STRUCT
     _pack_ = 8
@@ -71,7 +70,7 @@ def hook_SetVolumeAttributes(ql: Qiling, address: int, params):
     "AuthenticationStatus"  : POINTER   # OUT PTR(UINT32)
 })
 def hook_ReadFile(ql: Qiling, address: int, params):
-    pass
+    return EFI_NOT_FOUND
 
 @dxeapi(params = {
     "This"                  : POINTER,          # IN CONST PTR(EFI_FIRMWARE_VOLUME2_PROTOCOL)
@@ -83,7 +82,7 @@ def hook_ReadFile(ql: Qiling, address: int, params):
     "AuthenticationStatus"  : POINTER           # OUT PTR(UINT32)
 })
 def hook_ReadSection(ql: Qiling, address: int, params):
-    pass
+    return EFI_NOT_FOUND
 
 @dxeapi(params = {
     "This"                  : POINTER,              # IN CONST PTR(EFI_FIRMWARE_VOLUME2_PROTOCOL)

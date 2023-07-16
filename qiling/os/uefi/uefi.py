@@ -3,8 +3,9 @@
 # Cross Platform and Multi Architecture Advanced Binary Emulation Framework
 #
 
+from ctypes import sizeof
 import re
-from typing import Any, Callable, Iterable, Mapping, MutableSequence, Sequence, Tuple
+from typing import Any, Callable, Iterable, Mapping, MutableMapping, MutableSequence, Sequence, Tuple
 from unicorn import UcError
 
 from qiling import Qiling
@@ -13,9 +14,10 @@ from qiling.const import QL_INTERCEPT, QL_OS
 from qiling.os.const import *
 from qiling.os.memory import QlMemoryHeap
 from qiling.os.os import QlOs, QlOsUtils
-from qiling.os.fcall import QlFunctionCall, TypedArg
+from qiling.os.fcall import QlFunctionCall, TypedArg, Accessor
 
 from qiling.os.uefi import guids_db
+from qiling.os.uefi.ProcessorBind import *
 from qiling.os.uefi.smm import SmmEnv
 
 
@@ -38,7 +40,29 @@ class QlOsUefi(QlOs):
             64: intel.ms64
         }[ql.arch.bits](ql.arch)
 
-        self.fcall = QlFunctionCall(ql, cc)
+
+        def __make_accessor(nbytes: int) -> Accessor:
+            nbits = nbytes * 8
+            reader = lambda si: cc.getRawParam(si, nbits)
+            writer = lambda si, val: cc.setRawParam(si, val, nbits)
+            nslots = cc.getNumSlots(nbits)
+
+            return (reader, writer, nslots)
+
+        # default parameter accessors: readers, writers and slots count
+        accessors: MutableMapping[int, Accessor] = {
+            INT8 : __make_accessor(sizeof(INT8)),
+            INT16: __make_accessor(sizeof(INT16)),
+            INT32: __make_accessor(sizeof(INT32)),
+            INT64: __make_accessor(sizeof(INT64)),
+            UINT8 : __make_accessor(sizeof(UINT8)),
+            UINT16: __make_accessor(sizeof(UINT16)),
+            UINT32: __make_accessor(sizeof(UINT32)),
+            UINT64: __make_accessor(sizeof(UINT64)),
+            
+        }
+
+        self.fcall = QlFunctionCall(ql, cc, accessors=accessors)
 
     def save(self):
         saved_state = super(QlOsUefi, self).save()
