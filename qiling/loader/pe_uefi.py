@@ -21,6 +21,9 @@ from qiling.os.uefi.protocols import EfiSmmCpuProtocol
 from qiling.os.uefi.protocols import EfiSmmSwDispatch2Protocol
 from qiling.os.uefi.protocols import PcdProtocol
 from qiling.os.uefi.protocols import EfiFirmwareVolume2Protocol
+from qiling.os.uefi.protocols import EfiHiiStringProtocol
+from qiling.os.uefi.protocols import EfiHiiDatabaseProtocol
+from qiling.os.uefi.protocols import EfiHiiConfigRoutingProtocolGuid
 
 class QlLoaderPE_UEFI(QlLoader):
     def __init__(self, ql: Qiling):
@@ -263,7 +266,10 @@ class QlLoaderPE_UEFI(QlLoader):
 
         protocols = (
             EfiSmmAccess2Protocol,
-            EfiSmmBase2Protocol
+            EfiSmmBase2Protocol,
+            EfiHiiStringProtocol,
+            EfiHiiDatabaseProtocol, 
+            EfiHiiConfigRoutingProtocolGuid
         )
 
         for p in protocols:
