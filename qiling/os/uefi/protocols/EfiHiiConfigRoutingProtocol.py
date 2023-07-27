@@ -11,7 +11,7 @@ from ..fncc import *
 from ..ProcessorBind import *
 from ..UefiBaseType import *
 
-EFI_STRING = PTR(UINT16)
+from qiling.os.uefi.UefiInternalFormRepresentation import EFI_STRING
 
 # @see: MdePkg\Include\Protocol\HiiConfigRouting.h
 class EFI_HII_CONFIG_ROUTING_PROTOCOL(STRUCT):
@@ -29,7 +29,7 @@ class EFI_HII_CONFIG_ROUTING_PROTOCOL(STRUCT):
 
 @dxeapi(params = {
     "This"          : POINTER,  # IN CONST PTR(EFI_HII_CONFIG_ROUTING_PROTOCOL)
-    "Request"       : POINTER,  # IN CONST EFI_STRING
+    "Request"       : WSTRING,  # IN CONST EFI_STRING
     "Progress"      : POINTER,  # OUT PTR(EFI_STRING)
     "Results"      : POINTER,   # OUT PTR(EFI_STRING)
 })
@@ -45,7 +45,7 @@ def hook_ExportConfig(ql: Qiling, address: int, params):
 
 @dxeapi(params = {
     "This"          : POINTER,  # IN CONST PTR(EFI_HII_CONFIG_ROUTING_PROTOCOL)
-    "Configuration" : POINTER,  # IN CONST EFI_STRING
+    "Configuration" : WSTRING,  # IN CONST EFI_STRING
     "Progress"      : POINTER,  # OUT PTR(EFI_STRING)
 })
 def hook_RouteConfig(ql: Qiling, address: int, params):
@@ -53,7 +53,7 @@ def hook_RouteConfig(ql: Qiling, address: int, params):
 
 @dxeapi(params = {
     "This"          : POINTER,  # IN CONST PTR(EFI_HII_CONFIG_ROUTING_PROTOCOL)
-    "ConfigRequest" : POINTER,  # IN CONST EFI_STRING
+    "ConfigRequest" : WSTRING,  # IN CONST EFI_STRING
     "Block"         : POINTER,  # IN CONST PTR(UINT8)
     "BlockSize"     : UINTN,    # IN CONST UINTN
     "Config"        : POINTER,  # OUT PTR(EFI_STRING)
@@ -64,7 +64,7 @@ def hook_BlockToConfig(ql: Qiling, address: int, params):
 
 @dxeapi(params = {
     "This"          : POINTER,  # IN CONST PTR(EFI_HII_CONFIG_ROUTING_PROTOCOL)
-    "ConfigResp"    : POINTER,  # IN CONST EFI_STRING FIXME this is from EDK2 UEFI Spec has PTR(EFI_STRING) instead?!
+    "ConfigResp"    : WSTRING,  # IN CONST EFI_STRING FIXME this is from EDK2 UEFI Spec has PTR(EFI_STRING) instead?!
     "Block"         : POINTER,  # IN OUT PTR(UINT8)
     "BlockSize"     : UINTN,    # IN OUT PTR(UINTN)
     "Progress"      : POINTER,  # OUT PTR(EFI_STRING)
@@ -74,11 +74,11 @@ def hook_ConfigToBlock(ql: Qiling, address: int, params):
 
 @dxeapi(params = {
     "This"          : POINTER,  # IN CONST PTR(EFI_HII_CONFIG_ROUTING_PROTOCOL)
-    "ConfigResp"    : POINTER,  # IN CONST EFI_STRING
+    "ConfigResp"    : WSTRING,  # IN CONST EFI_STRING
     "Guid"          : POINTER,  # IN CONST PTR(EFI_GUID)
-    "Name"          : POINTER,  # IN CONST EFI_STRING
+    "Name"          : WSTRING,  # IN CONST EFI_STRING
     "DevicePath"    : POINTER,  # IN CONST PTR(EFI_DEVICE_PATH_PROTOCOL)
-    "AltCfgId"      : POINTER,  # IN CONST EFI_STRING
+    "AltCfgId"      : WSTRING,  # IN CONST EFI_STRING
     "AltCfgResp"    : POINTER,  # OUT PTR(EFI_STRING)
 })
 def hook_GetAltConfig(ql: Qiling, address: int, params):

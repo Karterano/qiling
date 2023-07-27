@@ -10,22 +10,12 @@ from ..fncc import *
 from ..ProcessorBind import *
 from ..UefiBaseType import *
 
-EFI_HII_HANDLE = PTR(VOID)
+from qiling.os.uefi.protocols.EfiHiiFontProtocol import EFI_FONT_INFO
 
-EFI_STRING_ID = UINT16
-
-EFI_STRING = PTR(UINT16)
-
-EFI_HII_FONT_STYLE = UINT32
+from qiling.os.uefi.UefiInternalFormRepresentation import EFI_HII_HANDLE, EFI_STRING, EFI_STRING_ID
 
 
-class EFI_FONT_INFO(STRUCT):
-    _fields_ = [
-        ('FontStyle',   EFI_HII_FONT_STYLE),
-        ('FontSize',    UINT16),
-        ('FontName',    PTR(CHAR16))  # Array
-    ]
-
+# @see: MdePkg\Include\Protocol\HiiString.h
 class EFI_HII_STRING_PROTOCOL(STRUCT):
     EFI_HII_STRING_PROTOCOL = STRUCT
     _pack_ = 8
@@ -44,7 +34,7 @@ class EFI_HII_STRING_PROTOCOL(STRUCT):
     "StringId"      : POINTER,  # OUT PTR(EFI_STRING_ID)
     "Language"      : POINTER,  # IN CONST PTR(CHAR8)
     "LanguageName"  : POINTER,  # IN CONST PTR(CHAR16)
-    "String"        : POINTER,  # IN CONST EFI_STRING
+    "String"        : WSTRING,  # IN CONST EFI_STRING
     "StringFontInfo": POINTER   # IN CONST PTR(EFI_FONT_INFO)
 })
 def hook_NewString(ql: Qiling, address: int, params):
@@ -55,7 +45,7 @@ def hook_NewString(ql: Qiling, address: int, params):
     "Language"      : POINTER,          # IN CONST PTR(CHAR8)
     "PackageList"   : POINTER,          # IN EFI_HII_HANDLE
     "StringId"      : EFI_STRING_ID,    # IN EFI_STRING_ID
-    "String"        : POINTER,          # OUT EFI_STRING
+    "String"        : WSTRING,          # OUT EFI_STRING
     "StringSize"    : POINTER,          # IN OUT PTR(UINTN)
     "StringFontInfo": POINTER,          # OUT EFI_FONT_INFO PTR(PTR(EFI_FONT_INFO))
 })
@@ -67,7 +57,7 @@ def hook_GetString(ql: Qiling, address: int, params):
     "PackageList"       : POINTER,          # IN EFI_HII_HANDLE
     "StringId"          : EFI_STRING_ID,    # IN EFI_STRING_ID
     "Language"          : POINTER,          # IN CONST PTR(CHAR8)
-    "String"            : POINTER,          # IN CONST EFI_STRING
+    "String"            : WSTRING,          # IN CONST EFI_STRING
     "StringFontInfo"    : POINTER           # IN CONST PTR(EFI_FONT_INFO)
 })
 def hook_SetString(ql: Qiling, address: int, params):

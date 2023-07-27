@@ -189,6 +189,9 @@ class QlOs:
 
         return tuple((aname, ahandlers[type(avalue)](avalue)) for atype, aname, avalue in targs)
 
+    def process_return_val(self, retval):
+        return retval
+
     def call(self, pc: int, func: Callable, proto: Mapping[str, Any], onenter: Optional[Callable], onexit: Optional[Callable], passthru: bool = False):
         # resolve arguments values according to their types
         args = self.resolve_fcall_params(proto)
@@ -199,8 +202,11 @@ class QlOs:
         # post-process arguments values
         pargs = self.process_fcall_params(targs)
 
+        # post-process return value
+        pretval = self.process_return_val(retval)
+
         # print
-        self.utils.print_function(pc, func.__name__, pargs, retval, passthru)
+        self.utils.print_function(pc, func.__name__, pargs, pretval, passthru)
 
         # append syscall to list
         self.stats.log_api_call(pc, func.__name__, args, retval, retaddr)

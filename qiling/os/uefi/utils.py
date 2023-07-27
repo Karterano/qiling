@@ -143,6 +143,8 @@ def init_struct(ql: Qiling, base: int, descriptor: Mapping):
             else:
                 setattr(isntance, name, value)
 
+                ql.log.info(f' | {name:36s} {hex(value)}')
+
     ql.log.info(f'')
 
     return isntance

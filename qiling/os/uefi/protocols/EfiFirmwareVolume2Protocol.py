@@ -129,10 +129,10 @@ descriptor = {
         ("GetVolumeAttributes", hook_GetVolumeAttributes),
         ("SetVolumeAttributes", hook_SetVolumeAttributes),
         ("ReadFile",            hook_ReadFile),
-        ("ReadSection",    hook_ReadSection),
-        ("WriteFile",    hook_WriteFile),
-        ("GetNextFile",    hook_GetNextFile),
-        ("GetInfo",    hook_GetInfo),
-        ("SetInfo",    hook_SetInfo),
+        ("ReadSection",         hook_ReadSection),
+        ("WriteFile",           hook_WriteFile),
+        ("GetNextFile",         hook_GetNextFile),
+        ("GetInfo",             hook_GetInfo),
+        ("SetInfo",             hook_SetInfo),
     )
 }

@@ -17,6 +17,7 @@ from qiling.os.os import QlOs, QlOsUtils
 from qiling.os.fcall import QlFunctionCall, TypedArg, Accessor
 
 from qiling.os.uefi import guids_db
+from qiling.os.uefi import const
 from qiling.os.uefi.ProcessorBind import *
 from qiling.os.uefi.smm import SmmEnv
 
@@ -101,6 +102,20 @@ class QlOsUefi(QlOs):
         }
 
         return tuple((aname, ahandlers.get(atype, fallback)(avalue)) for atype, aname, avalue in targs)
+
+    # FIXME that is a really hacky way to do things, but I don't have to rewrite all the constants now
+    def process_return_val(self, retval: int | None):
+        if retval is None:
+            return retval
+        # TODO colors might fail on other systems, but I don't care
+        if const.EFI_ERROR(retval):
+            color = "\x1b[0;31;40m"
+        else:
+            color = "\x1b[0;32;40m"
+        for name, value in vars(const).items():
+            if value == retval:
+                return f"{color}{name}\x1b[0m"
+        return retval
 
     def notify_after_module_execution(self, nmodules: int) -> bool:
         """Callback fired after a module has finished executing successfully.

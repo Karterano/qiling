@@ -3,7 +3,8 @@
 # Cross Platform and Multi Architecture Advanced Binary Emulation Framework
 #
 
-from pefile import PE
+from ctypes import sizeof
+from pefile import PE, DIRECTORY_ENTRY, ResourceDirData, ResourceDirEntryData
 from typing import Any, Mapping, Optional, Sequence
 
 from qiling import Qiling
@@ -23,7 +24,15 @@ from qiling.os.uefi.protocols import PcdProtocol
 from qiling.os.uefi.protocols import EfiFirmwareVolume2Protocol
 from qiling.os.uefi.protocols import EfiHiiStringProtocol
 from qiling.os.uefi.protocols import EfiHiiDatabaseProtocol
-from qiling.os.uefi.protocols import EfiHiiConfigRoutingProtocolGuid
+from qiling.os.uefi.protocols import EfiHiiConfigRoutingProtocol
+from qiling.os.uefi.protocols import EfiHiiFontProtocol
+from qiling.os.uefi.protocols import EfiHiiImageProtocol
+from qiling.os.uefi.protocols import EfiGraphicsOutputProtocol
+from qiling.os.uefi.protocols import EfiHiiPackageListProtocol
+
+# TODO remove
+from qiling.os.uefi.ProcessorBind import *
+from qiling.os.uefi.UefiInternalFormRepresentation import EFI_HII_PACKAGE_LIST_HEADER
 
 class QlLoaderPE_UEFI(QlLoader):
     def __init__(self, ql: Qiling):
@@ -76,6 +85,19 @@ class QlLoaderPE_UEFI(QlLoader):
         self.context.install_protocol(descriptor, image_base)
 
         self.context.loaded_image_protocol_modules.append(image_base)
+    
+    def install_hii_package_list_protocol(self, image_base: int):
+        ptr_hii_package_list_header = 0
+
+        descriptor = EfiHiiPackageListProtocol.make_descriptor(ptr_hii_package_list_header)
+        self.context.install_protocol(descriptor, image_base)
+
+        # TODO install an address listener somewhere, such that we know when this pointer is accessed
+        #  Only function hooks are printed so far, not variable members of a struct
+        # TODO think of maintaining this differently and just as the spec says:
+        #  change the install_protocol() helper function, such that is also accepts trivial pointers instead of
+        #  structs and handles the malloc, ... differently
+
 
     def map_and_load(self, path: str, context: UefiContext, exec_now: bool=False):
         """Map and load a module into memory.
@@ -128,6 +150,16 @@ class QlLoaderPE_UEFI(QlLoader):
         #  (generally find out, when and where protocols should be installed)
         #  then see where EfiFirmwareVolume2Protocol should be loaded respectively
         self.context.install_protocol(EfiFirmwareVolume2Protocol.descriptor, image_base)
+
+        # TODO if the pe file contains a hii resource (like Setup.pe in .rsrc), then we mustalso install a 
+        #  EFI_HII_PACKAGE_LIST_PROTOCOL onto its handle
+        if hasattr(pe, 'DIRECTORY_ENTRY_RESOURCE'):
+            resource_dir_data: ResourceDirData = pe.DIRECTORY_ENTRY_RESOURCE
+            entry: ResourceDirEntryData
+            for entry in resource_dir_data.entries:
+                if str(entry.name) == "HII":
+                    self.install_hii_package_list_protocol(image_base)
+
 
         # this would be used later be loader.find_containing_image
         self.images.append(Image(image_base, image_base + image_size, path))
@@ -269,7 +301,10 @@ class QlLoaderPE_UEFI(QlLoader):
             EfiSmmBase2Protocol,
             EfiHiiStringProtocol,
             EfiHiiDatabaseProtocol, 
-            EfiHiiConfigRoutingProtocolGuid
+            EfiHiiConfigRoutingProtocol,
+            EfiHiiFontProtocol,
+            EfiHiiImageProtocol,
+            EfiGraphicsOutputProtocol
         )
 
         for p in protocols:
