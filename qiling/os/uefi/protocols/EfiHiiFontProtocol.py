@@ -34,7 +34,7 @@ class EFI_FONT_INFO(STRUCT):
     _fields_ = [
         ('FontStyle',   EFI_HII_FONT_STYLE),
         ('FontSize',    UINT16),
-        ('FontName',    PTR(CHAR16))  # Array[1]
+        ('FontName',    CHAR16 * 1)  # Array[1]
     ]
 
 class EFI_FONT_DISPLAY_INFO(STRUCT):

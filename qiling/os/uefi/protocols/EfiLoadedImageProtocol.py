@@ -8,6 +8,7 @@ from ..UefiBaseType import *
 from ..UefiSpec import EFI_SYSTEM_TABLE, EFI_DEVICE_PATH_PROTOCOL, EFI_IMAGE_UNLOAD
 from ..UefiMultiPhase import EFI_MEMORY_TYPE
 
+# @see: MdePkg\Include\Protocol\LoadedImage.h
 class EFI_LOADED_IMAGE_PROTOCOL(STRUCT):
     _pack_ = 8
 

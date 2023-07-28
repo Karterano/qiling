@@ -8,6 +8,8 @@ import binascii
 from uuid import UUID
 from typing import Optional, Mapping
 
+import ctypes
+
 from qiling import Qiling
 from qiling.os.uefi.const import EFI_SUCCESS
 from qiling.os.uefi.UefiBaseType import EFI_GUID
@@ -142,8 +144,10 @@ def init_struct(ql: Qiling, base: int, descriptor: Mapping):
             # a value: set it
             else:
                 setattr(isntance, name, value)
-
-                ql.log.info(f' | {name:36s} {hex(value)}')
+                # arrays of other values might not be pretty printed
+                if isinstance(value, ctypes.Array) and isinstance(value[0], int):
+                    value = '[' + ' '.join(hex(v) for v in value) + ']'
+                ql.log.info(f' | {name:36s} {value}')
 
     ql.log.info(f'')
 

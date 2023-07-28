@@ -16,6 +16,7 @@ from qiling.os.const import PARAM_INTN, POINTER
 from qiling.os.uefi import st, smst, utils
 from qiling.os.uefi.context import DxeContext, SmmContext, UefiContext
 from qiling.os.uefi.protocols import EfiLoadedImageProtocol
+from qiling.os.uefi.protocols import EfiLoadedImageDevicePathProtocol
 from qiling.os.uefi.protocols import EfiSmmAccess2Protocol
 from qiling.os.uefi.protocols import EfiSmmBase2Protocol
 from qiling.os.uefi.protocols import EfiSmmCpuProtocol
@@ -85,19 +86,30 @@ class QlLoaderPE_UEFI(QlLoader):
         self.context.install_protocol(descriptor, image_base)
 
         self.context.loaded_image_protocol_modules.append(image_base)
-    
+
+    def install_loaded_image_device_path_protocol(self, image_base: int):
+        # TODO actually initialize the fields
+        fields = {
+
+        }
+
+        descriptor = EfiLoadedImageDevicePathProtocol.make_descriptor(fields)
+        self.context.install_protocol(descriptor, image_base)
+
     def install_hii_package_list_protocol(self, image_base: int):
+        # TODO actually initialize a struct, write it, and then use its pointer instead of this placeholder
         ptr_hii_package_list_header = 0
 
         descriptor = EfiHiiPackageListProtocol.make_descriptor(ptr_hii_package_list_header)
-        self.context.install_protocol(descriptor, image_base)
+        address = self.context.heap.alloc(EfiHiiPackageListProtocol.EFI_HII_PACKAGE_LIST_PROTOCOL.sizeof())
+        self.context.install_protocol(descriptor, image_base, address)
 
         # TODO install an address listener somewhere, such that we know when this pointer is accessed
-        #  Only function hooks are printed so far, not variable members of a struct
-        # TODO think of maintaining this differently and just as the spec says:
-        #  change the install_protocol() helper function, such that is also accepts trivial pointers instead of
-        #  structs and handles the malloc, ... differently
-
+        #  Only function hooks are printed so far, not variable members of a struct)
+        def _access_hook(ql: Qiling, context = None):
+            ql.log.info("Accessed EFI_HII_PACKAGE_LIST_PROTOCOL!")
+        self.ql.hook_address(_access_hook, address)
+        
 
     def map_and_load(self, path: str, context: UefiContext, exec_now: bool=False):
         """Map and load a module into memory.
@@ -144,15 +156,21 @@ class QlLoaderPE_UEFI(QlLoader):
         if self.entry_point == 0:
             self.entry_point = entry_point
 
+        # TODO the next four protocols are installed on a handle once it is loaded, 
+        #  but this is defined only if they are loaded by the BootServices->LoadImage() function.
+        #  at least this functionality should also be supported in Qilings LoadImage() function (just a stub currently)
+        # TODO also investitage whether this behaviour would also apply if it is loaded by DxeCore,
+        #  or if that also interally must use the LoadImage() boot service, then instead transfer it into the service
+        #  and use it here.
+        # TODO since it is either the boot service functions or DxeCores responsibility to install these protocols
+        #  on the module handle, can also factor it out into a util function, like "check_and_install_protocols()" or smth
         self.install_loaded_image_protocol(image_base, image_size)
-        # TODO loading things like this seems not like it should be
-        #  look into whether EfiLoadedImageProtocol is always installed per Documentation when an image is loaded
-        #  (generally find out, when and where protocols should be installed)
-        #  then see where EfiFirmwareVolume2Protocol should be loaded respectively
+
+        # TODO also install EFI_LOADED_IMAGE_DEVICE_PATH_PROTOCOL
+        self.install_loaded_image_device_path_protocol(image_base)
+
         self.context.install_protocol(EfiFirmwareVolume2Protocol.descriptor, image_base)
 
-        # TODO if the pe file contains a hii resource (like Setup.pe in .rsrc), then we mustalso install a 
-        #  EFI_HII_PACKAGE_LIST_PROTOCOL onto its handle
         if hasattr(pe, 'DIRECTORY_ENTRY_RESOURCE'):
             resource_dir_data: ResourceDirData = pe.DIRECTORY_ENTRY_RESOURCE
             entry: ResourceDirEntryData
@@ -200,6 +218,7 @@ class QlLoaderPE_UEFI(QlLoader):
         Returns: `True` to stop the teardown process, `False` to proceed
         """
 
+        # TODO also unloaded all other protocols that are installed on the protocols handle
         for handle in context.loaded_image_protocol_modules:
             struct_addr = context.protocols[handle][self.loaded_image_protocol_guid]
             loaded_image_protocol = EfiLoadedImageProtocol.EFI_LOADED_IMAGE_PROTOCOL.loadFrom(self.ql, struct_addr)
