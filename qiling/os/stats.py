@@ -58,9 +58,6 @@ class QlOsStats:
             retaddr : address to which the api function returned
         """
 
-        if name.startswith('hook_'):
-            name = name[5:]
-
         self.syscalls.setdefault(name, []).append({
             'params'   : params,
             'retval'   : retval,

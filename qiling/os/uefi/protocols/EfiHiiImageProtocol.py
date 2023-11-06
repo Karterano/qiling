@@ -53,64 +53,64 @@ class EFI_HII_IMAGE_PROTOCOL(STRUCT):
         ('DrawImageId', FUNCPTR(EFI_STATUS, PTR(EFI_HII_IMAGE_PROTOCOL), EFI_HII_DRAW_FLAGS, EFI_HII_HANDLE, EFI_IMAGE_ID, PTR(PTR(EFI_IMAGE_OUTPUT)), UINTN, UINTN))
     ]
 
-@dxeapi(params = {
-    "This"              : POINTER,              # IN CONST  PTR(EFI_HII_IMAGE_PROTOCOL)
-    "PackageList"       : POINTER,              # IN        EFI_HII_HANDLE
-    "ImageId"           : POINTER,              # OUT       PTR(EFI_IMAGE_ID)
-    "Image"             : POINTER               # IN CONST  PTR(EFI_IMAGE_INPUT)
-})
-def hook_NewImage(ql: Qiling, address: int, params):
-    pass
+    @dxeapi(params = {
+        "This"              : POINTER,              # IN CONST  PTR(EFI_HII_IMAGE_PROTOCOL)
+        "PackageList"       : POINTER,              # IN        EFI_HII_HANDLE
+        "ImageId"           : POINTER,              # OUT       PTR(EFI_IMAGE_ID)
+        "Image"             : POINTER               # IN CONST  PTR(EFI_IMAGE_INPUT)
+    })
+    def hook_NewImage(ql: Qiling, address: int, params):
+        pass
 
-@dxeapi(params = {
-    "This"              : POINTER,              # IN CONST  PTR(EFI_HII_IMAGE_PROTOCOL)
-    "PackageList"       : POINTER,              # IN        EFI_HII_HANDLE
-    "ImageId"           : POINTER,              # IN        EFI_IMAGE_ID
-    "Image"             : POINTER               # OUT       PTR(EFI_IMAGE_INPUT)
-})
-def hook_GetImage(ql: Qiling, address: int, params):
-    pass
+    @dxeapi(params = {
+        "This"              : POINTER,              # IN CONST  PTR(EFI_HII_IMAGE_PROTOCOL)
+        "PackageList"       : POINTER,              # IN        EFI_HII_HANDLE
+        "ImageId"           : POINTER,              # IN        EFI_IMAGE_ID
+        "Image"             : POINTER               # OUT       PTR(EFI_IMAGE_INPUT)
+    })
+    def hook_GetImage(ql: Qiling, address: int, params):
+        pass
 
-@dxeapi(params = {
-    "This"              : POINTER,              # IN CONST  PTR(EFI_HII_IMAGE_PROTOCOL)
-    "PackageList"       : POINTER,              # IN        EFI_HII_HANDLE
-    "ImageId"           : POINTER,              # IN        EFI_IMAGE_ID
-    "Image"             : POINTER               # IN CONST  PTR(EFI_IMAGE_INPUT)
-})
-def hook_SetImage(ql: Qiling, address: int, params):
-    pass
+    @dxeapi(params = {
+        "This"              : POINTER,              # IN CONST  PTR(EFI_HII_IMAGE_PROTOCOL)
+        "PackageList"       : POINTER,              # IN        EFI_HII_HANDLE
+        "ImageId"           : POINTER,              # IN        EFI_IMAGE_ID
+        "Image"             : POINTER               # IN CONST  PTR(EFI_IMAGE_INPUT)
+    })
+    def hook_SetImage(ql: Qiling, address: int, params):
+        pass
 
-@dxeapi(params = {
-    "This"              : POINTER,              # IN CONST  PTR(EFI_HII_IMAGE_PROTOCOL)
-    "Flags"             : EFI_HII_DRAW_FLAGS,   # IN        EFI_HII_DRAW_FLAGS
-    "Image"             : POINTER,              # IN CONST  PTR(EFI_IMAGE_INPUT)
-    "Blt"               : POINTER,              # IN OUT    PTR(PTR(EFI_IMAGE_OUTPUT))
-    "BltX"              : UINTN,                # IN        UINTN
-    "BltY"              : UINTN                 # IN        UINTN
-})
-def hook_DrawImage(ql: Qiling, address: int, params):
-    pass
+    @dxeapi(params = {
+        "This"              : POINTER,              # IN CONST  PTR(EFI_HII_IMAGE_PROTOCOL)
+        "Flags"             : EFI_HII_DRAW_FLAGS,   # IN        EFI_HII_DRAW_FLAGS
+        "Image"             : POINTER,              # IN CONST  PTR(EFI_IMAGE_INPUT)
+        "Blt"               : POINTER,              # IN OUT    PTR(PTR(EFI_IMAGE_OUTPUT))
+        "BltX"              : UINTN,                # IN        UINTN
+        "BltY"              : UINTN                 # IN        UINTN
+    })
+    def hook_DrawImage(ql: Qiling, address: int, params):
+        pass
 
-@dxeapi(params = {
-    "This"              : POINTER,              # IN CONST  PTR(EFI_HII_IMAGE_PROTOCOL)
-    "Flags"             : EFI_HII_DRAW_FLAGS,   # IN        EFI_HII_DRAW_FLAGS
-    "PackageList"       : POINTER,              # IN        EFI_HII_HANDLE
-    "ImageId"           : POINTER,              # IN        EFI_IMAGE_ID
-    "Blt"               : POINTER,              # IN OUT    PTR(PTR(EFI_IMAGE_OUTPUT))
-    "BltX"              : UINTN,                # IN        UINTN
-    "BltY"              : UINTN                 # IN        UINTN
-})
-def hook_DrawImageId(ql: Qiling, address: int, params):
-    pass
+    @dxeapi(params = {
+        "This"              : POINTER,              # IN CONST  PTR(EFI_HII_IMAGE_PROTOCOL)
+        "Flags"             : EFI_HII_DRAW_FLAGS,   # IN        EFI_HII_DRAW_FLAGS
+        "PackageList"       : POINTER,              # IN        EFI_HII_HANDLE
+        "ImageId"           : POINTER,              # IN        EFI_IMAGE_ID
+        "Blt"               : POINTER,              # IN OUT    PTR(PTR(EFI_IMAGE_OUTPUT))
+        "BltX"              : UINTN,                # IN        UINTN
+        "BltY"              : UINTN                 # IN        UINTN
+    })
+    def hook_DrawImageId(ql: Qiling, address: int, params):
+        pass
 
 descriptor = {
     "guid" : "31a6406a-6bdf-4e46-b2a2-ebaa89c40920",
     "struct" : EFI_HII_IMAGE_PROTOCOL,
     "fields" : (
-        ("NewImage", hook_NewImage),
-        ("GetImage", hook_GetImage),
-        ("SetImage", hook_SetImage),
-        ("DrawImage", hook_DrawImage),
-        ("DrawImageId", hook_DrawImageId)
+        ("NewImage", EFI_HII_IMAGE_PROTOCOL.hook_NewImage),
+        ("GetImage", EFI_HII_IMAGE_PROTOCOL.hook_GetImage),
+        ("SetImage", EFI_HII_IMAGE_PROTOCOL.hook_SetImage),
+        ("DrawImage", EFI_HII_IMAGE_PROTOCOL.hook_DrawImage),
+        ("DrawImageId", EFI_HII_IMAGE_PROTOCOL.hook_DrawImageId)
     )
 }

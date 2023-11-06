@@ -78,44 +78,44 @@ class EFI_GRAPHICS_OUTPUT_PROTOCOL(STRUCT):
         ('Mode',            PTR(EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE))
     ]
 
-@dxeapi(params = {
-    "This"          : POINTER,  # IN        PTR(CONST EFI_HII_STRING_PROTOCOL)
-    "ModeNumber"    : UINT32,   # IN        UINT32
-    "SizeOfInfo"    : POINTER,  # OUT       PTR(UINTN)
-    "Info"          : POINTER   # OUT       PTR(PTR(EFI_GRAPHICS_OUTPUT_MODE_INFORMATION))
-})
-def hook_QueryMode(ql: Qiling, address: int, params):
-    pass
+    @dxeapi(params = {
+        "This"          : POINTER,  # IN        PTR(CONST EFI_HII_STRING_PROTOCOL)
+        "ModeNumber"    : UINT32,   # IN        UINT32
+        "SizeOfInfo"    : POINTER,  # OUT       PTR(UINTN)
+        "Info"          : POINTER   # OUT       PTR(PTR(EFI_GRAPHICS_OUTPUT_MODE_INFORMATION))
+    })
+    def hook_QueryMode(ql: Qiling, address: int, params):
+        pass
 
-@dxeapi(params = {
-    "This"          : POINTER,  # IN        PTR(CONST EFI_HII_STRING_PROTOCOL)
-    "ModeNumber"    : UINT32    # IN        UINT32
-})
-def hook_SetMode(ql: Qiling, address: int, params):
-    pass
+    @dxeapi(params = {
+        "This"          : POINTER,  # IN        PTR(CONST EFI_HII_STRING_PROTOCOL)
+        "ModeNumber"    : UINT32    # IN        UINT32
+    })
+    def hook_SetMode(ql: Qiling, address: int, params):
+        pass
 
-@dxeapi(params = {
-    "This"          : POINTER,  # IN        PTR(CONST EFI_HII_STRING_PROTOCOL)
-    "BltBuffer"     : POINTER,  # IN        PTR(EFI_GRAPHICS_OUTPUT_BLT_PIXEL)  OPTIONAL
-    "BltOperation"  : ENUM,     # IN        EFI_GRAPHICS_OUTPUT_BLT_OPERATION
-    "SourceX"       : UINTN,    # IN        UINTN
-    "SourceY"       : UINTN,    # IN        UINTN
-    "DestinationX"  : UINTN,    # IN        UINTN
-    "DestinationY"  : UINTN,    # IN        UINTN
-    "Width"         : UINTN,    # IN        UINTN
-    "Height"        : UINTN,    # IN        UINTN
-    "Delta"         : UINTN,    # IN        UINTN                               OPTIONAL
-})
-def hook_Blt(ql: Qiling, address: int, params):
-    pass
+    @dxeapi(params = {
+        "This"          : POINTER,  # IN        PTR(CONST EFI_HII_STRING_PROTOCOL)
+        "BltBuffer"     : POINTER,  # IN        PTR(EFI_GRAPHICS_OUTPUT_BLT_PIXEL)  OPTIONAL
+        "BltOperation"  : ENUM,     # IN        EFI_GRAPHICS_OUTPUT_BLT_OPERATION
+        "SourceX"       : UINTN,    # IN        UINTN
+        "SourceY"       : UINTN,    # IN        UINTN
+        "DestinationX"  : UINTN,    # IN        UINTN
+        "DestinationY"  : UINTN,    # IN        UINTN
+        "Width"         : UINTN,    # IN        UINTN
+        "Height"        : UINTN,    # IN        UINTN
+        "Delta"         : UINTN,    # IN        UINTN                               OPTIONAL
+    })
+    def hook_Blt(ql: Qiling, address: int, params):
+        pass
 
 descriptor = {
     "guid" : "9042a9de-23dc-4a38-96fb-7aded080516a",
     "struct" : EFI_GRAPHICS_OUTPUT_PROTOCOL,
     "fields" : (
-        ("QueryMode", hook_QueryMode),
-        ("SetMode", hook_SetMode),
-        ("Blt", hook_Blt),
+        ("QueryMode", EFI_GRAPHICS_OUTPUT_PROTOCOL.hook_QueryMode),
+        ("SetMode", EFI_GRAPHICS_OUTPUT_PROTOCOL.hook_SetMode),
+        ("Blt", EFI_GRAPHICS_OUTPUT_PROTOCOL.hook_Blt),
         # TODO this should probably be initialized properly
         ("Mode", 0)
     )

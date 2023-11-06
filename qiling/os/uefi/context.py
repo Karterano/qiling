@@ -4,8 +4,9 @@ from typing import Any, Mapping, MutableSequence, Optional, Tuple
 from qiling import Qiling
 from qiling.os.memory import QlMemoryHeap
 from qiling.os.uefi.ProcessorBind import STRUCT, CPU_STACK_ALIGNMENT
-from qiling.os.uefi.UefiSpec import EFI_CONFIGURATION_TABLE, EFI_SYSTEM_TABLE
+from qiling.os.uefi.UefiSpec import EFI_CONFIGURATION_TABLE
 from qiling.os.uefi.smst import EFI_SMM_SYSTEM_TABLE2
+from qiling.os.uefi.st import EFI_SYSTEM_TABLE
 from qiling.os.uefi import utils
 
 class UefiContext(ABC):

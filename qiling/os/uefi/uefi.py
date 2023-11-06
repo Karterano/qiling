@@ -117,6 +117,10 @@ class QlOsUefi(QlOs):
                 return f"{color}{name}\x1b[0m"
         return retval
 
+    def process_func_name(self, func: Callable) -> str:
+        fname = func.__qualname__
+        return fname.replace('hook_', '').replace('.', '->')
+
     def notify_after_module_execution(self, nmodules: int) -> bool:
         """Callback fired after a module has finished executing successfully.
 

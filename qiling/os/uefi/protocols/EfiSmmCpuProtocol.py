@@ -92,54 +92,6 @@ class EFI_SMM_SAVE_STATE_REGISTER(ENUM_UC):
         'PROCESSOR_ID'    : 514
     }
 
-# EFI_SUCCESS            The register was written from Save State
-# EFI_NOT_FOUND            The register is not defined for the Save State of Processor
-# EFI_INVALID_PARAMETER    ProcessorIndex or Width is not correct
-
-@dxeapi(params = {
-    "This"        : POINTER,    # EFI_SMM_CPU_PROTOCOL
-    "Width"        : ULONGLONG,# UINTN
-    "Register"    : INT,        # EFI_SMM_SAVE_STATE_REGISTER
-    "CpuIndex"    : ULONGLONG,# UINTN
-    "Buffer"    : POINTER    # PTR(VOID)
-})
-def hook_SmmReadSaveState(ql: Qiling, address: int, params):
-    Width    = params['Width']
-    Register = params['Register']
-    CpuIndex = params['CpuIndex']
-    Buffer   = params['Buffer']
-
-    # currently supporting only one cpu
-    if CpuIndex > 0:
-        return EFI_INVALID_PARAMETER
-
-    data = ql.os.smm.ssa.read(Register, Width)
-    ql.mem.write(Buffer, bytes(data))
-
-    return EFI_SUCCESS
-
-@dxeapi(params = {
-    "This"        : POINTER,    # EFI_SMM_CPU_PROTOCOL
-    "Width"        : ULONGLONG,# UINTN
-    "Register"    : INT,        # EFI_SMM_SAVE_STATE_REGISTER
-    "CpuIndex"    : ULONGLONG,# UINTN
-    "Buffer"    : POINTER    # PTR(VOID)
-})
-def hook_SmmWriteSaveState(ql: Qiling, address: int, params):
-    Width    = params['Width']
-    Register = params['Register']
-    CpuIndex = params['CpuIndex']
-    Buffer   = params['Buffer']
-
-    # currently supporting only one cpu
-    if CpuIndex > 0:
-        return EFI_INVALID_PARAMETER
-
-    data = ql.mem.read(Buffer, Width)
-    ql.os.smm.ssa.write(Register, bytes(data))
-
-    return EFI_SUCCESS
-
 class EFI_SMM_CPU_PROTOCOL(STRUCT):
     EFI_SMM_CPU_PROTOCOL = STRUCT
 
@@ -147,12 +99,59 @@ class EFI_SMM_CPU_PROTOCOL(STRUCT):
         ('SmmReadSaveState',    FUNCPTR(PTR(EFI_SMM_CPU_PROTOCOL), UINTN, EFI_SMM_SAVE_STATE_REGISTER, UINTN, PTR(VOID))),
         ('SmmWriteSaveState',    FUNCPTR(PTR(EFI_SMM_CPU_PROTOCOL), UINTN, EFI_SMM_SAVE_STATE_REGISTER, UINTN, PTR(VOID)))
     ]
+    # EFI_SUCCESS            The register was written from Save State
+    # EFI_NOT_FOUND            The register is not defined for the Save State of Processor
+    # EFI_INVALID_PARAMETER    ProcessorIndex or Width is not correct
 
+    @dxeapi(params = {
+        "This"        : POINTER,    # EFI_SMM_CPU_PROTOCOL
+        "Width"        : ULONGLONG,# UINTN
+        "Register"    : INT,        # EFI_SMM_SAVE_STATE_REGISTER
+        "CpuIndex"    : ULONGLONG,# UINTN
+        "Buffer"    : POINTER    # PTR(VOID)
+    })
+    def hook_SmmReadSaveState(ql: Qiling, address: int, params):
+        Width    = params['Width']
+        Register = params['Register']
+        CpuIndex = params['CpuIndex']
+        Buffer   = params['Buffer']
+
+        # currently supporting only one cpu
+        if CpuIndex > 0:
+            return EFI_INVALID_PARAMETER
+
+        data = ql.os.smm.ssa.read(Register, Width)
+        ql.mem.write(Buffer, bytes(data))
+
+        return EFI_SUCCESS
+
+    @dxeapi(params = {
+        "This"        : POINTER,    # EFI_SMM_CPU_PROTOCOL
+        "Width"        : ULONGLONG,# UINTN
+        "Register"    : INT,        # EFI_SMM_SAVE_STATE_REGISTER
+        "CpuIndex"    : ULONGLONG,# UINTN
+        "Buffer"    : POINTER    # PTR(VOID)
+    })
+    def hook_SmmWriteSaveState(ql: Qiling, address: int, params):
+        Width    = params['Width']
+        Register = params['Register']
+        CpuIndex = params['CpuIndex']
+        Buffer   = params['Buffer']
+
+        # currently supporting only one cpu
+        if CpuIndex > 0:
+            return EFI_INVALID_PARAMETER
+
+        data = ql.mem.read(Buffer, Width)
+        ql.os.smm.ssa.write(Register, bytes(data))
+
+        return EFI_SUCCESS
+    
 descriptor = {
     "guid" : "eb346b97-975f-4a9f-8b22-f8e92bb3d569",
     "struct" : EFI_SMM_CPU_PROTOCOL,
     "fields" : (
-        ("SmmReadSaveState",    hook_SmmReadSaveState),
-        ("SmmWriteSaveState",    hook_SmmWriteSaveState)
+        ("SmmReadSaveState",    EFI_SMM_CPU_PROTOCOL.hook_SmmReadSaveState),
+        ("SmmWriteSaveState",    EFI_SMM_CPU_PROTOCOL.hook_SmmWriteSaveState)
     )
 }

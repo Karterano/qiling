@@ -13,7 +13,7 @@ from qiling.exception import QlErrorArch, QlMemoryMappedError
 from qiling.loader.loader import QlLoader, Image
 from qiling.os.const import PARAM_INTN, POINTER
 
-from qiling.os.uefi import st, smst, utils
+from qiling.os.uefi import smst, utils, StaticMemory
 from qiling.os.uefi.context import DxeContext, SmmContext, UefiContext
 from qiling.os.uefi.protocols import EfiLoadedImageProtocol
 from qiling.os.uefi.protocols import EfiLoadedImageDevicePathProtocol
@@ -315,7 +315,7 @@ class QlLoaderPE_UEFI(QlLoader):
         # executed, like the system table location
         context.end_of_execution_ptr = gST
 
-        st.initialize(ql, context, gST)
+        StaticMemory.initialize(ql, context, gST)
 
         protocols = (
             EfiSmmAccess2Protocol,

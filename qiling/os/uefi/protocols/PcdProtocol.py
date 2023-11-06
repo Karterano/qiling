@@ -77,258 +77,258 @@ class PCD_PROTOCOL(STRUCT):
         ('GetNextTokenSpace',    PCD_PROTOCOL_GET_NEXT_TOKENSPACE)
     ]
 
-@dxeapi(params = {
-    "SkuId" : UINT
-})
-def hook_SetSku(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "SkuId" : UINT
+    })
+    def hook_SetSku(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "TokenNumber" : UINT
-})
-def hook_Get8(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "TokenNumber" : UINT
+    })
+    def hook_Get8(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "TokenNumber" : UINT
-})
-def hook_Get16(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "TokenNumber" : UINT
+    })
+    def hook_Get16(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "TokenNumber" : UINT
-})
-def hook_Get32(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "TokenNumber" : UINT
+    })
+    def hook_Get32(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "TokenNumber" : UINT
-})
-def hook_Get64(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "TokenNumber" : UINT
+    })
+    def hook_Get64(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "TokenNumber" : UINT
-})
-def hook_GetPtr(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "TokenNumber" : UINT
+    })
+    def hook_GetPtr(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "TokenNumber" : UINT
-})
-def hook_GetBool(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "TokenNumber" : UINT
+    })
+    def hook_GetBool(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "TokenNumber" : UINT
-})
-def hook_GetSize(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "TokenNumber" : UINT
+    })
+    def hook_GetSize(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "Guid"            : GUID,
-    "TokenNumber"    : UINT
-})
-def hook_Get8Ex(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "Guid"            : GUID,
+        "TokenNumber"    : UINT
+    })
+    def hook_Get8Ex(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "Guid"            : GUID,
-    "TokenNumber"    : UINT
-})
-def hook_Get16Ex(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "Guid"            : GUID,
+        "TokenNumber"    : UINT
+    })
+    def hook_Get16Ex(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "Guid"            : GUID,
-    "TokenNumber"    : UINT
-})
-def hook_Get32Ex(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "Guid"            : GUID,
+        "TokenNumber"    : UINT
+    })
+    def hook_Get32Ex(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "Guid"            : GUID,
-    "TokenNumber"    : UINT
-})
-def hook_Get64Ex(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "Guid"            : GUID,
+        "TokenNumber"    : UINT
+    })
+    def hook_Get64Ex(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "Guid"            : GUID,
-    "TokenNumber"    : UINT
-})
-def hook_GetPtrEx(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "Guid"            : GUID,
+        "TokenNumber"    : UINT
+    })
+    def hook_GetPtrEx(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "Guid"            : GUID,
-    "TokenNumber"    : UINT
-})
-def hook_GetBoolEx(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "Guid"            : GUID,
+        "TokenNumber"    : UINT
+    })
+    def hook_GetBoolEx(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "Guid"            : GUID,
-    "TokenNumber"    : UINT
-})
-def hook_GetSizeEx(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "Guid"            : GUID,
+        "TokenNumber"    : UINT
+    })
+    def hook_GetSizeEx(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "TokenNumber"    : UINT,
-    "Value"            : INT
-})
-def hook_Set8(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "TokenNumber"    : UINT,
+        "Value"            : INT
+    })
+    def hook_Set8(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "TokenNumber"    : UINT,
-    "Value"            : INT
-})
-def hook_Set16(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "TokenNumber"    : UINT,
+        "Value"            : INT
+    })
+    def hook_Set16(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "TokenNumber"    : UINT,
-    "Value"            : INT
-})
-def hook_Set32(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "TokenNumber"    : UINT,
+        "Value"            : INT
+    })
+    def hook_Set32(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "TokenNumber"    : UINT,
-    "Value"            : INT
-})
-def hook_Set64(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "TokenNumber"    : UINT,
+        "Value"            : INT
+    })
+    def hook_Set64(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "TokenNumber"    : UINT,
-    "SizeOfValue"    : POINTER,
-    "Buffer"        : POINTER
-})
-def hook_SetPtr(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "TokenNumber"    : UINT,
+        "SizeOfValue"    : POINTER,
+        "Buffer"        : POINTER
+    })
+    def hook_SetPtr(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "TokenNumber"    : UINT,
-    "Value"            : INT
-})
-def hook_SetBool(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "TokenNumber"    : UINT,
+        "Value"            : INT
+    })
+    def hook_SetBool(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "Guid"            : GUID,
-    "TokenNumber"    : UINT,
-    "Value"            : INT
-})
-def hook_Set8Ex(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "Guid"            : GUID,
+        "TokenNumber"    : UINT,
+        "Value"            : INT
+    })
+    def hook_Set8Ex(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "Guid"            : GUID,
-    "TokenNumber"    : UINT,
-    "Value"            : INT
-})
-def hook_Set16Ex(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "Guid"            : GUID,
+        "TokenNumber"    : UINT,
+        "Value"            : INT
+    })
+    def hook_Set16Ex(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "Guid"            : GUID,
-    "TokenNumber"    : UINT,
-    "Value"            : INT
-})
-def hook_Set32Ex(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "Guid"            : GUID,
+        "TokenNumber"    : UINT,
+        "Value"            : INT
+    })
+    def hook_Set32Ex(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "Guid"            : GUID,
-    "TokenNumber"    : UINT,
-    "Value"            : INT
-})
-def hook_Set64Ex(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "Guid"            : GUID,
+        "TokenNumber"    : UINT,
+        "Value"            : INT
+    })
+    def hook_Set64Ex(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "Guid"            : GUID,
-    "TokenNumber"    : UINT,
-    "SizeOfValue"    : POINTER,
-    "Buffer"        : POINTER
-})
-def hook_SetPtrEx(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "Guid"            : GUID,
+        "TokenNumber"    : UINT,
+        "SizeOfValue"    : POINTER,
+        "Buffer"        : POINTER
+    })
+    def hook_SetPtrEx(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "Guid"            : GUID,
-    "TokenNumber"    : UINT,
-    "Value"            : INT
-})
-def hook_SetBoolEx(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "Guid"            : GUID,
+        "TokenNumber"    : UINT,
+        "Value"            : INT
+    })
+    def hook_SetBoolEx(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "Guid"                : GUID,
-    "TokenNumber"        : UINT,
-    "CallBackFunction"    : POINTER
-})
-def hook_CallbackOnSet(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "Guid"                : GUID,
+        "TokenNumber"        : UINT,
+        "CallBackFunction"    : POINTER
+    })
+    def hook_CallbackOnSet(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "Guid"                : GUID,
-    "TokenNumber"        : UINT,
-    "CallBackFunction"    : POINTER
-})
-def hook_CancelCallback(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "Guid"                : GUID,
+        "TokenNumber"        : UINT,
+        "CallBackFunction"    : POINTER
+    })
+    def hook_CancelCallback(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "Guid"            : GUID,
-    "TokenNumber"    : POINTER
-})
-def hook_GetNextToken(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "Guid"            : GUID,
+        "TokenNumber"    : POINTER
+    })
+    def hook_GetNextToken(ql, address, params):
+        pass
 
-@dxeapi(params = {
-    "Guid" : POINTER
-})
-def hook_GetNextTokenSpace(ql, address, params):
-    pass
+    @dxeapi(params = {
+        "Guid" : POINTER
+    })
+    def hook_GetNextTokenSpace(ql, address, params):
+        pass
 
 descriptor = {
     "guid" : "11b34006-d85b-4d0a-a290-d5a571310ef7",
     "struct" : PCD_PROTOCOL,
     "fields" : (
-        ('SetSku',                hook_SetSku),
-        ('Get8',                hook_Get8),
-        ('Get16',                hook_Get16),
-        ('Get32',                hook_Get32),
-        ('Get64',                hook_Get64),
-        ('GetPtr',                hook_GetPtr),
-        ('GetBool',                hook_GetBool),
-        ('GetSize',                hook_GetSize),
-        ('Get8Ex',                hook_Get8Ex),
-        ('Get16Ex',                hook_Get16Ex),
-        ('Get32Ex',                hook_Get32Ex),
-        ('Get64Ex',                hook_Get64Ex),
-        ('GetPtrEx',            hook_GetPtrEx),
-        ('GetBoolEx',            hook_GetBoolEx),
-        ('GetSizeEx',            hook_GetSizeEx),
-        ('Set8',                hook_Set8),
-        ('Set16',                hook_Set16),
-        ('Set32',                hook_Set32),
-        ('Set64',                hook_Set64),
-        ('SetPtr',                hook_SetPtr),
-        ('SetBool',                hook_SetBool),
-        ('Set8Ex',                hook_Set8Ex),
-        ('Set16Ex',                hook_Set16Ex),
-        ('Set32Ex',                hook_Set32Ex),
-        ('Set64Ex',                hook_Set64Ex),
-        ('SetPtrEx',            hook_SetPtrEx),
-        ('SetBoolEx',            hook_SetBoolEx),
-        ('CallbackOnSet',        hook_CallbackOnSet),
-        ('CancelCallback',        hook_CancelCallback),
-        ('GetNextToken',        hook_GetNextToken),
-        ('GetNextTokenSpace',    hook_GetNextTokenSpace)
+        ('SetSku',              PCD_PROTOCOL.hook_SetSku),
+        ('Get8',                PCD_PROTOCOL.hook_Get8),
+        ('Get16',               PCD_PROTOCOL.hook_Get16),
+        ('Get32',               PCD_PROTOCOL.hook_Get32),
+        ('Get64',               PCD_PROTOCOL.hook_Get64),
+        ('GetPtr',              PCD_PROTOCOL.hook_GetPtr),
+        ('GetBool',             PCD_PROTOCOL.hook_GetBool),
+        ('GetSize',             PCD_PROTOCOL.hook_GetSize),
+        ('Get8Ex',              PCD_PROTOCOL.hook_Get8Ex),
+        ('Get16Ex',             PCD_PROTOCOL.hook_Get16Ex),
+        ('Get32Ex',             PCD_PROTOCOL.hook_Get32Ex),
+        ('Get64Ex',             PCD_PROTOCOL.hook_Get64Ex),
+        ('GetPtrEx',            PCD_PROTOCOL.hook_GetPtrEx),
+        ('GetBoolEx',           PCD_PROTOCOL.hook_GetBoolEx),
+        ('GetSizeEx',           PCD_PROTOCOL.hook_GetSizeEx),
+        ('Set8',                PCD_PROTOCOL.hook_Set8),
+        ('Set16',               PCD_PROTOCOL.hook_Set16),
+        ('Set32',               PCD_PROTOCOL.hook_Set32),
+        ('Set64',               PCD_PROTOCOL.hook_Set64),
+        ('SetPtr',              PCD_PROTOCOL.hook_SetPtr),
+        ('SetBool',             PCD_PROTOCOL.hook_SetBool),
+        ('Set8Ex',              PCD_PROTOCOL.hook_Set8Ex),
+        ('Set16Ex',             PCD_PROTOCOL.hook_Set16Ex),
+        ('Set32Ex',             PCD_PROTOCOL.hook_Set32Ex),
+        ('Set64Ex',             PCD_PROTOCOL.hook_Set64Ex),
+        ('SetPtrEx',            PCD_PROTOCOL.hook_SetPtrEx),
+        ('SetBoolEx',           PCD_PROTOCOL.hook_SetBoolEx),
+        ('CallbackOnSet',       PCD_PROTOCOL.hook_CallbackOnSet),
+        ('CancelCallback',      PCD_PROTOCOL.hook_CancelCallback),
+        ('GetNextToken',        PCD_PROTOCOL.hook_GetNextToken),
+        ('GetNextTokenSpace',   PCD_PROTOCOL.hook_GetNextTokenSpace)
     )
 }

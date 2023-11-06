@@ -58,65 +58,65 @@ class EFI_HII_FONT_PROTOCOL(STRUCT):
         ('GetFontInfo',     FUNCPTR(EFI_STATUS, PTR(EFI_HII_FONT_PROTOCOL), PTR(EFI_FONT_HANDLE), PTR(EFI_FONT_DISPLAY_INFO), PTR(PTR(EFI_FONT_DISPLAY_INFO)), EFI_STRING))
     ]
 
-@dxeapi(params = {
-    "This"              : POINTER,              # IN CONST  PTR(EFI_HII_FONT_PROTOCOL)
-    "Flags"             : EFI_HII_OUT_FLAGS,    # IN        EFI_HII_OUT_FLAGS
-    "String"            : WSTRING,              # IN CONST  EFI_STRING
-    "StringInfo"        : POINTER,              # IN CONST  PTR(EFI_FONT_DISPLAY_INFO)
-    "Blt"               : POINTER,              # IN OUT    PTR(PTR(EFI_IMAGE_OUTPUT))
-    "BltX"              : UINTN,                # IN        UINTN
-    "BltY"              : UINTN,                # IN        UINTN
-    "RowInfoArray"      : POINTER,              # OUT       PTR(PTR(EFI_HII_ROW_INFO))  OPTIONAL
-    "RowInfoArraySize"  : POINTER,              # OUT       PTR(UINTN)                  OPTIONAL
-    "ColumnInfoArray"   : POINTER               # OUT       PTR(UINTN)                  OPTIONAL
-})
-def hook_StringToImage(ql: Qiling, address: int, params):
-    pass
+    @dxeapi(params = {
+        "This"              : POINTER,              # IN CONST  PTR(EFI_HII_FONT_PROTOCOL)
+        "Flags"             : EFI_HII_OUT_FLAGS,    # IN        EFI_HII_OUT_FLAGS
+        "String"            : WSTRING,              # IN CONST  EFI_STRING
+        "StringInfo"        : POINTER,              # IN CONST  PTR(EFI_FONT_DISPLAY_INFO)
+        "Blt"               : POINTER,              # IN OUT    PTR(PTR(EFI_IMAGE_OUTPUT))
+        "BltX"              : UINTN,                # IN        UINTN
+        "BltY"              : UINTN,                # IN        UINTN
+        "RowInfoArray"      : POINTER,              # OUT       PTR(PTR(EFI_HII_ROW_INFO))  OPTIONAL
+        "RowInfoArraySize"  : POINTER,              # OUT       PTR(UINTN)                  OPTIONAL
+        "ColumnInfoArray"   : POINTER               # OUT       PTR(UINTN)                  OPTIONAL
+    })
+    def hook_StringToImage(ql: Qiling, address: int, params):
+        pass
 
-@dxeapi(params = {
-    "This"              : POINTER,              # IN CONST  PTR(EFI_HII_FONT_PROTOCOL)
-    "Flags"             : EFI_HII_OUT_FLAGS,    # IN        EFI_HII_OUT_FLAGS
-    "PackageList"       : POINTER,              # IN        EFI_HII_HANDLE
-    "StringId"          : EFI_STRING_ID,        # IN        EFI_STRING_ID
-    "Language"          : POINTER,              # IN CONST  PTR(CHAR8)
-    "StringInfo"        : POINTER,              # IN CONST  PTR(EFI_FONT_DISPLAY_INFO)  OPTIONAL
-    "Blt"               : POINTER,              # IN OUT    PTR(PTR(EFI_IMAGE_OUTPUT))
-    "BltX"              : UINTN,                # IN        UINTN
-    "BltY"              : UINTN,                # IN        UINTN
-    "RowInfoArray"      : POINTER,              # OUT       PTR(PTR(EFI_HII_ROW_INFO))  OPTIONAL
-    "RowInfoArraySize"  : POINTER,              # OUT       PTR(UINTN)                  OPTIONAL
-    "ColumnInfoArray"   : POINTER               # OUT       PTR(UINTN)                  OPTIONAL
-})
-def hook_StringIdToImage(ql: Qiling, address: int, params):
-    pass
+    @dxeapi(params = {
+        "This"              : POINTER,              # IN CONST  PTR(EFI_HII_FONT_PROTOCOL)
+        "Flags"             : EFI_HII_OUT_FLAGS,    # IN        EFI_HII_OUT_FLAGS
+        "PackageList"       : POINTER,              # IN        EFI_HII_HANDLE
+        "StringId"          : EFI_STRING_ID,        # IN        EFI_STRING_ID
+        "Language"          : POINTER,              # IN CONST  PTR(CHAR8)
+        "StringInfo"        : POINTER,              # IN CONST  PTR(EFI_FONT_DISPLAY_INFO)  OPTIONAL
+        "Blt"               : POINTER,              # IN OUT    PTR(PTR(EFI_IMAGE_OUTPUT))
+        "BltX"              : UINTN,                # IN        UINTN
+        "BltY"              : UINTN,                # IN        UINTN
+        "RowInfoArray"      : POINTER,              # OUT       PTR(PTR(EFI_HII_ROW_INFO))  OPTIONAL
+        "RowInfoArraySize"  : POINTER,              # OUT       PTR(UINTN)                  OPTIONAL
+        "ColumnInfoArray"   : POINTER               # OUT       PTR(UINTN)                  OPTIONAL
+    })
+    def hook_StringIdToImage(ql: Qiling, address: int, params):
+        pass
 
-@dxeapi(params = {
-    "This"              : POINTER,              # IN CONST  PTR(EFI_HII_FONT_PROTOCOL)
-    "Char"              : CHAR16,               # IN CONST  CHAR16
-    "StringInfo"        : POINTER,              # IN CONST  PTR(EFI_FONT_DISPLAY_INFO)
-    "Blt"               : POINTER,              # OUT       PTR(PTR(EFI_IMAGE_OUTPUT))
-    "Baseline"          : POINTER               # OUT       PTR(UINTN)                  OPTIONAL
-})
-def hook_GetGlyph(ql: Qiling, address: int, params):
-    pass
+    @dxeapi(params = {
+        "This"              : POINTER,              # IN CONST  PTR(EFI_HII_FONT_PROTOCOL)
+        "Char"              : CHAR16,               # IN CONST  CHAR16
+        "StringInfo"        : POINTER,              # IN CONST  PTR(EFI_FONT_DISPLAY_INFO)
+        "Blt"               : POINTER,              # OUT       PTR(PTR(EFI_IMAGE_OUTPUT))
+        "Baseline"          : POINTER               # OUT       PTR(UINTN)                  OPTIONAL
+    })
+    def hook_GetGlyph(ql: Qiling, address: int, params):
+        pass
 
-@dxeapi(params = {
-    "This"              : POINTER,          # IN CONST      PTR(EFI_HII_FONT_PROTOCOL)
-    "FontHandle"        : POINTER,          # IN OUT        PTR(EFI_FONT_HANDLE)
-    "StringInfoIn"      : POINTER,          # IN CONST      PTR(EFI_FONT_DISPLAY_INFO)  OPTIONAL
-    "StringInfoOut"     : POINTER,          # OUT           PTR(PTR(EFI_FONT_DISPLAY_INFO))
-    "String"            : WSTRING           # IN CONST      EFI_STRING                  OPTIONAL
-})
-def hook_GetFontInfo(ql: Qiling, address: int, params):
-    pass
+    @dxeapi(params = {
+        "This"              : POINTER,          # IN CONST      PTR(EFI_HII_FONT_PROTOCOL)
+        "FontHandle"        : POINTER,          # IN OUT        PTR(EFI_FONT_HANDLE)
+        "StringInfoIn"      : POINTER,          # IN CONST      PTR(EFI_FONT_DISPLAY_INFO)  OPTIONAL
+        "StringInfoOut"     : POINTER,          # OUT           PTR(PTR(EFI_FONT_DISPLAY_INFO))
+        "String"            : WSTRING           # IN CONST      EFI_STRING                  OPTIONAL
+    })
+    def hook_GetFontInfo(ql: Qiling, address: int, params):
+        pass
 
 descriptor = {
     "guid" : "e9ca4775-8657-47fc-97e7-7ed65a084324",
     "struct" : EFI_HII_FONT_PROTOCOL,
     "fields" : (
-        ("StringToImage", hook_StringToImage),
-        ("StringIdToImage", hook_StringIdToImage),
-        ("GetGlyph", hook_GetGlyph),
-        ("GetFontInfo", hook_GetFontInfo)
+        ("StringToImage", EFI_HII_FONT_PROTOCOL.hook_StringToImage),
+        ("StringIdToImage", EFI_HII_FONT_PROTOCOL.hook_StringIdToImage),
+        ("GetGlyph", EFI_HII_FONT_PROTOCOL.hook_GetGlyph),
+        ("GetFontInfo", EFI_HII_FONT_PROTOCOL.hook_GetFontInfo)
     )
 }

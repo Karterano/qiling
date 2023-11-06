@@ -108,169 +108,169 @@ class EFI_DXE_SERVICES(STRUCT):
         ('SetMemorySpaceCapabilities',    EFI_SET_MEMORY_SPACE_CAPABILITIES)
     ]
 
-@dxeapi(params={
-    "a0": ULONGLONG,
-    "a1": ULONGLONG,
-    "a2": ULONGLONG,
-    "a3": ULONGLONG,
-})
-def hook_AddMemorySpace(ctx, address, params):
-    return EFI_OUT_OF_RESOURCES
+    @dxeapi(params={
+        "a0": ULONGLONG,
+        "a1": ULONGLONG,
+        "a2": ULONGLONG,
+        "a3": ULONGLONG,
+    })
+    def hook_AddMemorySpace(ctx, address, params):
+        return EFI_OUT_OF_RESOURCES
 
-@dxeapi(params={
-    "a0": ULONGLONG,
-    "a1": ULONGLONG,
-    "a2": ULONGLONG,
-    "a3": ULONGLONG,
-    "a4": POINTER, #POINTER_T(ctypes.c_uint64)
-    "a5": POINTER, #POINTER_T(None)
-    "a6": POINTER, #POINTER_T(None)
-})
-def hook_AllocateMemorySpace(ctx, address, params):
-    return EFI_OUT_OF_RESOURCES
+    @dxeapi(params={
+        "a0": ULONGLONG,
+        "a1": ULONGLONG,
+        "a2": ULONGLONG,
+        "a3": ULONGLONG,
+        "a4": POINTER, #POINTER_T(ctypes.c_uint64)
+        "a5": POINTER, #POINTER_T(None)
+        "a6": POINTER, #POINTER_T(None)
+    })
+    def hook_AllocateMemorySpace(ctx, address, params):
+        return EFI_OUT_OF_RESOURCES
 
-@dxeapi(params={
-    "a0": ULONGLONG,
-    "a1": ULONGLONG,
-})
-def hook_FreeMemorySpace(ctx, address, params):
-    return EFI_SUCCESS
+    @dxeapi(params={
+        "a0": ULONGLONG,
+        "a1": ULONGLONG,
+    })
+    def hook_FreeMemorySpace(ctx, address, params):
+        return EFI_SUCCESS
 
-@dxeapi(params={
-    "a0": ULONGLONG,
-    "a1": ULONGLONG,
-})
-def hook_RemoveMemorySpace(ctx, address, params):
-    return EFI_SUCCESS
+    @dxeapi(params={
+        "a0": ULONGLONG,
+        "a1": ULONGLONG,
+    })
+    def hook_RemoveMemorySpace(ctx, address, params):
+        return EFI_SUCCESS
 
-@dxeapi(params={
-    "a0": ULONGLONG,
-    "a1": POINTER, #POINTER_T(struct_EFI_GCD_MEMORY_SPACE_DESCRIPTOR)
-})
-def hook_GetMemorySpaceDescriptor(ctx, address, params):
-    return EFI_UNSUPPORTED
+    @dxeapi(params={
+        "a0": ULONGLONG,
+        "a1": POINTER, #POINTER_T(struct_EFI_GCD_MEMORY_SPACE_DESCRIPTOR)
+    })
+    def hook_GetMemorySpaceDescriptor(ctx, address, params):
+        return EFI_UNSUPPORTED
 
-@dxeapi(params={
-    "a0": ULONGLONG,
-    "a1": ULONGLONG,
-    "a2": ULONGLONG,
-})
-def hook_SetMemorySpaceAttributes(ctx, address, params):
-    return EFI_UNSUPPORTED
+    @dxeapi(params={
+        "a0": ULONGLONG,
+        "a1": ULONGLONG,
+        "a2": ULONGLONG,
+    })
+    def hook_SetMemorySpaceAttributes(ctx, address, params):
+        return EFI_UNSUPPORTED
 
-@dxeapi(params={
-    "a0": POINTER, #POINTER_T(ctypes.c_uint64)
-    "a1": POINTER, #POINTER_T(POINTER_T(struct_EFI_GCD_MEMORY_SPACE_DESCRIPTOR))
-})
-def hook_GetMemorySpaceMap(ctx, address, params):
-    return EFI_UNSUPPORTED
+    @dxeapi(params={
+        "a0": POINTER, #POINTER_T(ctypes.c_uint64)
+        "a1": POINTER, #POINTER_T(POINTER_T(struct_EFI_GCD_MEMORY_SPACE_DESCRIPTOR))
+    })
+    def hook_GetMemorySpaceMap(ctx, address, params):
+        return EFI_UNSUPPORTED
 
-@dxeapi(params={
-    "a0": ULONGLONG,
-    "a1": ULONGLONG,
-    "a2": ULONGLONG,
-})
-def hook_AddIoSpace(ctx, address, params):
-    return EFI_OUT_OF_RESOURCES
+    @dxeapi(params={
+        "a0": ULONGLONG,
+        "a1": ULONGLONG,
+        "a2": ULONGLONG,
+    })
+    def hook_AddIoSpace(ctx, address, params):
+        return EFI_OUT_OF_RESOURCES
 
-@dxeapi(params={
-    "a0": ULONGLONG,
-    "a1": ULONGLONG,
-    "a2": ULONGLONG,
-    "a3": ULONGLONG,
-    "a4": POINTER, #POINTER_T(ctypes.c_uint64)
-    "a5": POINTER, #POINTER_T(None)
-    "a6": POINTER, #POINTER_T(None)
-})
-def hook_AllocateIoSpace(ctx, address, params):
-    return EFI_OUT_OF_RESOURCES
+    @dxeapi(params={
+        "a0": ULONGLONG,
+        "a1": ULONGLONG,
+        "a2": ULONGLONG,
+        "a3": ULONGLONG,
+        "a4": POINTER, #POINTER_T(ctypes.c_uint64)
+        "a5": POINTER, #POINTER_T(None)
+        "a6": POINTER, #POINTER_T(None)
+    })
+    def hook_AllocateIoSpace(ctx, address, params):
+        return EFI_OUT_OF_RESOURCES
 
-@dxeapi(params={
-    "a0": ULONGLONG,
-    "a1": ULONGLONG,
-})
-def hook_FreeIoSpace(ctx, address, params):
-    return EFI_SUCCESS
+    @dxeapi(params={
+        "a0": ULONGLONG,
+        "a1": ULONGLONG,
+    })
+    def hook_FreeIoSpace(ctx, address, params):
+        return EFI_SUCCESS
 
-@dxeapi(params={
-    "a0": ULONGLONG,
-    "a1": ULONGLONG,
-})
-def hook_RemoveIoSpace(ctx, address, params):
-    return EFI_SUCCESS
+    @dxeapi(params={
+        "a0": ULONGLONG,
+        "a1": ULONGLONG,
+    })
+    def hook_RemoveIoSpace(ctx, address, params):
+        return EFI_SUCCESS
 
-@dxeapi(params={
-    "a0": ULONGLONG,
-    "a1": POINTER, #POINTER_T(struct_EFI_GCD_IO_SPACE_DESCRIPTOR)
-})
-def hook_GetIoSpaceDescriptor(ctx, address, params):
-    return EFI_NOT_FOUND
+    @dxeapi(params={
+        "a0": ULONGLONG,
+        "a1": POINTER, #POINTER_T(struct_EFI_GCD_IO_SPACE_DESCRIPTOR)
+    })
+    def hook_GetIoSpaceDescriptor(ctx, address, params):
+        return EFI_NOT_FOUND
 
-@dxeapi(params={
-    "a0": POINTER, #POINTER_T(ctypes.c_uint64)
-    "a1": POINTER, #POINTER_T(POINTER_T(struct_EFI_GCD_IO_SPACE_DESCRIPTOR))
-})
-def hook_GetIoSpaceMap(ctx, address, params):
-    return EFI_OUT_OF_RESOURCES
+    @dxeapi(params={
+        "a0": POINTER, #POINTER_T(ctypes.c_uint64)
+        "a1": POINTER, #POINTER_T(POINTER_T(struct_EFI_GCD_IO_SPACE_DESCRIPTOR))
+    })
+    def hook_GetIoSpaceMap(ctx, address, params):
+        return EFI_OUT_OF_RESOURCES
 
-@dxeapi(params={
-})
-def hook_Dispatch(ctx, address, params):
-    return EFI_SUCCESS
+    @dxeapi(params={
+    })
+    def hook_Dispatch(ctx, address, params):
+        return EFI_SUCCESS
 
-@dxeapi(params={
-    "a0": POINTER, #POINTER_T(None)
-    "a1": GUID,
-})
-def hook_Schedule(ctx, address, params):
-    return EFI_SUCCESS
+    @dxeapi(params={
+        "a0": POINTER, #POINTER_T(None)
+        "a1": GUID,
+    })
+    def hook_Schedule(ctx, address, params):
+        return EFI_SUCCESS
 
-@dxeapi(params={
-    "a0": POINTER, #POINTER_T(None)
-    "a1": GUID,
-})
-def hook_Trust(ctx, address, params):
-    return EFI_NOT_FOUND
+    @dxeapi(params={
+        "a0": POINTER, #POINTER_T(None)
+        "a1": GUID,
+    })
+    def hook_Trust(ctx, address, params):
+        return EFI_NOT_FOUND
 
-@dxeapi(params={
-    "a0": POINTER, #POINTER_T(None)
-    "a1": ULONGLONG,
-    "a2": POINTER, #POINTER_T(POINTER_T(None))
-})
-def hook_ProcessFirmwareVolume(ctx, address, params):
-    return EFI_OUT_OF_RESOURCES
+    @dxeapi(params={
+        "a0": POINTER, #POINTER_T(None)
+        "a1": ULONGLONG,
+        "a2": POINTER, #POINTER_T(POINTER_T(None))
+    })
+    def hook_ProcessFirmwareVolume(ctx, address, params):
+        return EFI_OUT_OF_RESOURCES
 
-@dxeapi(params={
-    "a0": ULONGLONG,
-    "a1": ULONGLONG,
-    "a2": ULONGLONG,
-})
-def hook_SetMemorySpaceCapabilities(ctx, address, params):
-    return EFI_UNSUPPORTED
+    @dxeapi(params={
+        "a0": ULONGLONG,
+        "a1": ULONGLONG,
+        "a2": ULONGLONG,
+    })
+    def hook_SetMemorySpaceCapabilities(ctx, address, params):
+        return EFI_UNSUPPORTED
 
 def initialize(ql: Qiling, gDS: int):
     descriptor = {
         'struct' : EFI_DXE_SERVICES,
         'fields' : (
             ('Hdr',                            None),
-            ('AddMemorySpace',                hook_AddMemorySpace),
-            ('AllocateMemorySpace',            hook_AllocateMemorySpace),
-            ('FreeMemorySpace',                hook_FreeMemorySpace),
-            ('RemoveMemorySpace',            hook_RemoveMemorySpace),
-            ('GetMemorySpaceDescriptor',    hook_GetMemorySpaceDescriptor),
-            ('SetMemorySpaceAttributes',    hook_SetMemorySpaceAttributes),
-            ('GetMemorySpaceMap',            hook_GetMemorySpaceMap),
-            ('AddIoSpace',                    hook_AddIoSpace),
-            ('AllocateIoSpace',                hook_AllocateIoSpace),
-            ('FreeIoSpace',                    hook_FreeIoSpace),
-            ('RemoveIoSpace',                hook_RemoveIoSpace),
-            ('GetIoSpaceDescriptor',        hook_GetIoSpaceDescriptor),
-            ('GetIoSpaceMap',                hook_GetIoSpaceMap),
-            ('Dispatch',                    hook_Dispatch),
-            ('Schedule',                    hook_Schedule),
-            ('Trust',                        hook_Trust),
-            ('ProcessFirmwareVolume',        hook_ProcessFirmwareVolume),
-            ('SetMemorySpaceCapabilities',    hook_SetMemorySpaceCapabilities)
+            ('AddMemorySpace',                EFI_DXE_SERVICES.hook_AddMemorySpace),
+            ('AllocateMemorySpace',            EFI_DXE_SERVICES.hook_AllocateMemorySpace),
+            ('FreeMemorySpace',                EFI_DXE_SERVICES.hook_FreeMemorySpace),
+            ('RemoveMemorySpace',            EFI_DXE_SERVICES.hook_RemoveMemorySpace),
+            ('GetMemorySpaceDescriptor',    EFI_DXE_SERVICES.hook_GetMemorySpaceDescriptor),
+            ('SetMemorySpaceAttributes',    EFI_DXE_SERVICES.hook_SetMemorySpaceAttributes),
+            ('GetMemorySpaceMap',            EFI_DXE_SERVICES.hook_GetMemorySpaceMap),
+            ('AddIoSpace',                    EFI_DXE_SERVICES.hook_AddIoSpace),
+            ('AllocateIoSpace',                EFI_DXE_SERVICES.hook_AllocateIoSpace),
+            ('FreeIoSpace',                    EFI_DXE_SERVICES.hook_FreeIoSpace),
+            ('RemoveIoSpace',                EFI_DXE_SERVICES.hook_RemoveIoSpace),
+            ('GetIoSpaceDescriptor',        EFI_DXE_SERVICES.hook_GetIoSpaceDescriptor),
+            ('GetIoSpaceMap',                EFI_DXE_SERVICES.hook_GetIoSpaceMap),
+            ('Dispatch',                    EFI_DXE_SERVICES.hook_Dispatch),
+            ('Schedule',                    EFI_DXE_SERVICES.hook_Schedule),
+            ('Trust',                        EFI_DXE_SERVICES.hook_Trust),
+            ('ProcessFirmwareVolume',        EFI_DXE_SERVICES.hook_ProcessFirmwareVolume),
+            ('SetMemorySpaceCapabilities',    EFI_DXE_SERVICES.hook_SetMemorySpaceCapabilities)
         )
     }
 

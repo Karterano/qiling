@@ -25,28 +25,28 @@ class EFI_STATUS_CODE_DATA(STRUCT):
     ]
 
 # @see: MdePkg\Include\Protocol\MmAccess.h
-class _EFI_STATUS_CODE_PROTOCOL(STRUCT):
-    _EFI_STATUS_CODE_PROTOCOL = STRUCT
+class EFI_STATUS_CODE_PROTOCOL(STRUCT):
+    EFI_STATUS_CODE_PROTOCOL = STRUCT
     _pack_ = 8
 
     _fields_ = [
         ('ReportStatusCode',    FUNCPTR(EFI_STATUS, EFI_STATUS_CODE_TYPE ,EFI_STATUS_CODE_VALUE, UINT32, PTR(EFI_GUID), PTR(EFI_STATUS_CODE_DATA)))
     ]
 
-@dxeapi(params = {
-    "Type"      : EFI_STATUS_CODE_TYPE,     # IN EFI_STATUS_CODE_TYPE
-    "Value"     : EFI_STATUS_CODE_VALUE,    # IN EFI_STATUS_CODE_VALUE
-    "Instance"  : UINT32,                   # IN UINT32
-    "CallerId"  : POINTER,                  # IN PTR(EFI_GUID) OPTIONAL
-    "Data"      : POINTER                   # IN PTR(EFI_STATUS_CODE_DATA) OPTIONAL
-})
-def hook_ReportStatusCode(ql: Qiling, address: int, params):
-    pass
+    @dxeapi(params = {
+        "Type"      : EFI_STATUS_CODE_TYPE,     # IN EFI_STATUS_CODE_TYPE
+        "Value"     : EFI_STATUS_CODE_VALUE,    # IN EFI_STATUS_CODE_VALUE
+        "Instance"  : UINT32,                   # IN UINT32
+        "CallerId"  : POINTER,                  # IN PTR(EFI_GUID) OPTIONAL
+        "Data"      : POINTER                   # IN PTR(EFI_STATUS_CODE_DATA) OPTIONAL
+    })
+    def hook_ReportStatusCode(ql: Qiling, address: int, params):
+        pass
 
 descriptor = {
-    "guid" : "d2b2b828-0826-48a7-b3df-983c006024f0",
-    "struct" : _EFI_STATUS_CODE_PROTOCOL,
-    "fields" : (
-        ("ReportStatusCode", hook_ReportStatusCode),
-    )
+"guid" : "d2b2b828-0826-48a7-b3df-983c006024f0",
+"struct" : EFI_STATUS_CODE_PROTOCOL,
+"fields" : (
+    ("ReportStatusCode", EFI_STATUS_CODE_PROTOCOL.hook_ReportStatusCode),
+)
 }

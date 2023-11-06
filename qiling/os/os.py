@@ -179,6 +179,11 @@ class QlOs:
 
         return resolved
 
+    def process_func_name(self, func: Callable) -> str:
+        fname = func.__name__
+        if fname.startswith('hook_'):
+            fname = fname[5:]
+
     def process_fcall_params(self, targs: Iterable[TypedArg]) -> Sequence[Tuple[str, str]]:
         ahandlers: Mapping[type, Callable[[Any], str]] = {
             int       : lambda v: f'{v:#x}' if v else f'0',
@@ -199,6 +204,8 @@ class QlOs:
         # call hooked function
         targs, retval, retaddr = self.fcall.call(func, proto, args, onenter, onexit, passthru)
 
+        pname = self.process_func_name(func)
+
         # post-process arguments values
         pargs = self.process_fcall_params(targs)
 
@@ -206,10 +213,10 @@ class QlOs:
         pretval = self.process_return_val(retval)
 
         # print
-        self.utils.print_function(pc, func.__name__, pargs, pretval, passthru)
+        self.utils.print_function(pc, pname, pargs, pretval, passthru)
 
         # append syscall to list
-        self.stats.log_api_call(pc, func.__name__, args, retval, retaddr)
+        self.stats.log_api_call(pc, pname, args, retval, retaddr)
 
         if not passthru:
             # WORKAROUND: we avoid modifying the pc register in case the emulation has stopped.
