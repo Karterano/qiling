@@ -1,7 +1,7 @@
 [DXE]
 heap_address	= 0x04000000
-heap_size		= 0x01000000
-stack_address	= 0x05000000
+heap_size		= 0x02000000
+stack_address	= 0x06000000
 stack_size		= 0x00080000
 image_address 	= 0x00100000
 

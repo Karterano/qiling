@@ -5,8 +5,9 @@
 
 from ..ProcessorBind import *
 from ..UefiBaseType import *
-from ..UefiSpec import EFI_SYSTEM_TABLE, EFI_DEVICE_PATH_PROTOCOL, EFI_IMAGE_UNLOAD
+from ..UefiSpec import EFI_SYSTEM_TABLE, EFI_IMAGE_UNLOAD
 from ..UefiMultiPhase import EFI_MEMORY_TYPE
+from .EfiLDevicePathProtocol import EFI_DEVICE_PATH_PROTOCOL
 
 # @see: MdePkg\Include\Protocol\LoadedImage.h
 class EFI_LOADED_IMAGE_PROTOCOL(STRUCT):

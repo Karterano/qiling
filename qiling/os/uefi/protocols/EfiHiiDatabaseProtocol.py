@@ -44,7 +44,7 @@ class EFI_HII_DATABASE_PROTOCOL(STRUCT):
     "Handle"        : POINTER,  # OUT PTR(EFI_HII_HANDLE)
 })
 def hook_NewPackageList(ql: Qiling, address: int, params):
-    pass
+    return EFI_OUT_OF_RESOURCES
 
 @dxeapi(params = {
     "This"          : POINTER,  # IN CONST PTR(EFI_HII_DATABASE_PROTOCOL)

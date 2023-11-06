@@ -166,7 +166,9 @@ class QlLoaderPE_UEFI(QlLoader):
         #  on the module handle, can also factor it out into a util function, like "check_and_install_protocols()" or smth
         self.install_loaded_image_protocol(image_base, image_size)
 
-        # TODO also install EFI_LOADED_IMAGE_DEVICE_PATH_PROTOCOL
+        # TODO use a "shared device handle" (since all images will come from the same "device")
+        #  install the device path protocol first, then use it in the loaded image protocol
+        #  and also use it here
         self.install_loaded_image_device_path_protocol(image_base)
 
         self.context.install_protocol(EfiFirmwareVolume2Protocol.descriptor, image_base)
