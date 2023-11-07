@@ -125,33 +125,41 @@ write_int64 = ptr_write64
 
 def init_struct(ql: Qiling, base: int, descriptor: Mapping):
     struct_class = descriptor['struct']
-    struct_fields = descriptor.get('fields', [])
+    struct_initial_values = dict(descriptor.get('fields', []))
+    struct_fields = struct_class._fields_
 
-    isntance = struct_class()
+    instance = struct_class()
     ql.log.info(f'Initializing {struct_class.__name__}')
 
-    for name, value in struct_fields:
-        if value is not None:
+    for name, c_type in struct_fields:
+        if (value := struct_initial_values.get(name, None)) is not None:
             # a method: hook this field
             if callable(value):
                 p = base + struct_class.offsetof(name)
 
-                setattr(isntance, name, p)
+                setattr(instance, name, p)
                 ql.hook_address(value, p)
 
                 ql.log.info(f' | {name:36s} {p:#010x}')
 
             # a value: set it
             else:
-                setattr(isntance, name, value)
+                setattr(instance, name, value)
                 # arrays of other values might not be pretty printed
                 if isinstance(value, ctypes.Array) and isinstance(value[0], int):
                     value = '[' + ' '.join(hex(v) for v in value) + ']'
+                elif c_type.__name__.startswith("LP_8") or c_type.__name__.startswith("LP_4"):
+                    value = hex(value)
                 ql.log.info(f' | {name:36s} {value}')
+        else:
+            if c_type.__name__.startswith("LP_8"):
+                    ql.log.info(f' | {name:36s} *NULL')
+            else:
+                ql.log.info(f' | {name:36s} 0')
 
     ql.log.info(f'')
 
-    return isntance
+    return instance
 
 def str_to_guid(guid: str) -> EFI_GUID:
     """Construct an EFI_GUID structure out of a plain GUID string.

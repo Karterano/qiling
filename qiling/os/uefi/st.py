@@ -5,6 +5,7 @@
 
 from qiling import Qiling
 from qiling.os.uefi import bs, rt
+from qiling.os.uefi.utils import init_struct
 from .ProcessorBind import *
 from .UefiBaseType import *
 from .UefiMultiPhase import *
@@ -31,14 +32,20 @@ class EFI_SYSTEM_TABLE(STRUCT):
 
 
 def initialize(ql: Qiling, gST: int, gBS: int, gRT: int, cfg: int):
+    descriptor = {
+        'struct' : EFI_SYSTEM_TABLE,
+        'fields' : (
+            ('Hdr',                   None),
+            ('RuntimeServices',       gRT),
+            ('BootServices',          gBS),
+            ('NumberOfTableEntries',  0),
+            ('ConfigurationTable',    cfg)
+        )
+    }
+
     ql.loader.gST = gST
 
-    instance = EFI_SYSTEM_TABLE()
-    instance.RuntimeServices = gRT
-    instance.BootServices = gBS
-    instance.NumberOfTableEntries = 0
-    instance.ConfigurationTable = cfg
-
+    instance = init_struct(ql, gST, descriptor)
     instance.saveTo(ql, gST)
 
 __all__ = [
