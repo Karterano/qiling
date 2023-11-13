@@ -4,7 +4,7 @@
 #
 
 from ctypes import sizeof
-from pefile import PE, DIRECTORY_ENTRY, ResourceDirData, ResourceDirEntryData
+from pefile import PE, DIRECTORY_ENTRY, ResourceDirData, ResourceDirEntryData, ResourceDataEntryData
 from typing import Any, Mapping, Optional, Sequence
 
 from qiling import Qiling
@@ -30,10 +30,9 @@ from qiling.os.uefi.protocols import EfiHiiFontProtocol
 from qiling.os.uefi.protocols import EfiHiiImageProtocol
 from qiling.os.uefi.protocols import EfiGraphicsOutputProtocol
 from qiling.os.uefi.protocols import EfiHiiPackageListProtocol
+from qiling.os.uefi.protocols import EfiLDevicePathProtocol
 
-# TODO remove
-from qiling.os.uefi.ProcessorBind import *
-from qiling.os.uefi.UefiInternalFormRepresentation import EFI_HII_PACKAGE_LIST_HEADER
+
 
 class QlLoaderPE_UEFI(QlLoader):
     def __init__(self, ql: Qiling):
@@ -75,11 +74,12 @@ class QlLoaderPE_UEFI(QlLoader):
 
         self.ql.os.heap.restore(saved_state['heap'])
 
-    def install_loaded_image_protocol(self, image_base: int, image_size: int):
+    def install_loaded_image_protocol(self, image_base: int, image_size: int, device_path_handle: int):
         fields = {
             'gST'        : self.gST,
             'image_base' : image_base,
-            'image_size' : image_size
+            'image_size' : image_size,
+            'device_path': device_path_handle
         }
 
         descriptor = EfiLoadedImageProtocol.make_descriptor(fields)
@@ -96,19 +96,34 @@ class QlLoaderPE_UEFI(QlLoader):
         descriptor = EfiLoadedImageDevicePathProtocol.make_descriptor(fields)
         self.context.install_protocol(descriptor, image_base)
 
-    def install_hii_package_list_protocol(self, image_base: int):
-        # TODO actually initialize a struct, write it, and then use its pointer instead of this placeholder
-        ptr_hii_package_list_header = 0
+    def install_hii_package_list_protocol(self, image_base: int, hii_entry: ResourceDirEntryData):
+        # The data should be already loaded, just traverse the structure to eventually get the OffsetToData member.
+        # The first data at image_base + OffsetToData will be the EFI_HII_PACKAGE_LIST_HEADER
+        # add a pointer to this header as the EfiHiiPackageListProtocol
+        hii_data = None
+
+        hii_entry_subdir: ResourceDirData = hii_entry.directory
+        # self.ql.log.info(f"hii_entry directory: {hii_entry_subdir}")
+        
+        hii_entry_subdir_entry: ResourceDirEntryData
+        for hii_entry_subdir_entry in hii_entry_subdir.entries:
+            hii_entry_subdir_entry_subsubdir: ResourceDirData = hii_entry_subdir_entry.directory
+            # self.ql.log.info(f"hii_entry_subdir_entry directory: {hii_entry_subdir_entry_subsubdir}")
+            
+            hii_entry_subdir_entry_subsubdir_entry: ResourceDirEntryData
+            for hii_entry_subdir_entry_subsubdir_entry in hii_entry_subdir_entry_subsubdir.entries:
+                if hii_data is not None:
+                    raise Exception("Got more HII data than one!")
+                
+                hii_entry_subdir_entry_subsubdir_entry_data: ResourceDataEntryData = hii_entry_subdir_entry_subsubdir_entry.data
+                # self.ql.log.info(f"hii_entry_subdir_entry_subsubdir_entry data: {hii_entry_subdir_entry_subsubdir_entry_data}")
+                hii_data = hii_entry_subdir_entry_subsubdir_entry_data.struct
+
+        # self.ql.log.info(hii_data)
+        ptr_hii_package_list_header = image_base + hii_data.OffsetToData
 
         descriptor = EfiHiiPackageListProtocol.make_descriptor(ptr_hii_package_list_header)
-        address = self.context.heap.alloc(EfiHiiPackageListProtocol.EFI_HII_PACKAGE_LIST_PROTOCOL.sizeof())
-        self.context.install_protocol(descriptor, image_base, address)
-
-        # TODO install an address listener somewhere, such that we know when this pointer is accessed
-        #  Only function hooks are printed so far, not variable members of a struct)
-        def _access_hook(ql: Qiling, context = None):
-            ql.log.info("Accessed EFI_HII_PACKAGE_LIST_PROTOCOL!")
-        self.ql.hook_address(_access_hook, address)
+        self.context.install_protocol(descriptor, image_base)
         
 
     def map_and_load(self, path: str, context: UefiContext, exec_now: bool=False):
@@ -164,7 +179,7 @@ class QlLoaderPE_UEFI(QlLoader):
         #  and use it here.
         # TODO since it is either the boot service functions or DxeCores responsibility to install these protocols
         #  on the module handle, can also factor it out into a util function, like "check_and_install_protocols()" or smth
-        self.install_loaded_image_protocol(image_base, image_size)
+        self.install_loaded_image_protocol(image_base, image_size, device_path_handle=1)
 
         # TODO use a "shared device handle" (since all images will come from the same "device")
         #  install the device path protocol first, then use it in the loaded image protocol
@@ -178,7 +193,7 @@ class QlLoaderPE_UEFI(QlLoader):
             entry: ResourceDirEntryData
             for entry in resource_dir_data.entries:
                 if str(entry.name) == "HII":
-                    self.install_hii_package_list_protocol(image_base)
+                    self.install_hii_package_list_protocol(image_base, entry)
 
 
         # this would be used later be loader.find_containing_image
@@ -330,6 +345,11 @@ class QlLoaderPE_UEFI(QlLoader):
 
         for p in protocols:
             context.install_protocol(p.descriptor, 1)
+
+        # TODO this installs a single device path protocol on the "global" handle that will be 
+        #   referred to in all per-image loaded image protocols
+        #   It is also completely empty and invalid
+        context.install_protocol(EfiLDevicePathProtocol.make_descriptor({}), 1)
 
         return context
 

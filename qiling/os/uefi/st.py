@@ -9,7 +9,8 @@ from qiling.os.uefi.utils import init_struct
 from .ProcessorBind import *
 from .UefiBaseType import *
 from .UefiMultiPhase import *
-from qiling.os.uefi.UefiSpec import EFI_SIMPLE_TEXT_INPUT_PROTOCOL, EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL, EFI_CONFIGURATION_TABLE
+from qiling.os.uefi.UefiSpec import EFI_SIMPLE_TEXT_INPUT_PROTOCOL, EFI_CONFIGURATION_TABLE
+from qiling.os.uefi.protocols.EfiSimpleTextOutputProtocol import EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL
 
 class EFI_SYSTEM_TABLE(STRUCT):
     _pack_ = 8
@@ -31,15 +32,20 @@ class EFI_SYSTEM_TABLE(STRUCT):
     ]
 
 
-def initialize(ql: Qiling, gST: int, gBS: int, gRT: int, cfg: int):
+def initialize(ql: Qiling, gST: int, gBS: int, gRT: int, cfg: int, out: int):
     descriptor = {
         'struct' : EFI_SYSTEM_TABLE,
         'fields' : (
-            ('Hdr',                   None),
-            ('RuntimeServices',       gRT),
-            ('BootServices',          gBS),
-            ('NumberOfTableEntries',  0),
-            ('ConfigurationTable',    cfg)
+            ('Hdr',                     None),
+            ('ConsoleInHandle',        1),
+            ('ConsoleOutHandle',        1),
+            ('ConOut',                  out),
+            ('StandardErrorHandle',     1),
+            ('StdErr',                  out),
+            ('RuntimeServices',         gRT),
+            ('BootServices',            gBS),
+            ('NumberOfTableEntries',    0),
+            ('ConfigurationTable',      cfg)
         )
     }
 

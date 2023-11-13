@@ -1,9 +1,14 @@
 from abc import ABC, abstractmethod
+from collections import defaultdict
 from typing import Any, Mapping, MutableSequence, Optional, Tuple
+from uuid import UUID
 
 from qiling import Qiling
 from qiling.os.memory import QlMemoryHeap
 from qiling.os.uefi.ProcessorBind import STRUCT, CPU_STACK_ALIGNMENT
+from qiling.os.uefi.UefiInternalFormRepresentation import *
+from qiling.os.uefi.UefiInternalFormRepresentation import EFI_HII_PACKAGE_STRINGS, EFI_HII_PACKAGE_END
+from qiling.os.uefi.protocols.EfiLDevicePathProtocol import EFI_DEVICE_PATH_PROTOCOL
 from qiling.os.uefi.UefiSpec import EFI_CONFIGURATION_TABLE
 from qiling.os.uefi.smst import EFI_SMM_SYSTEM_TABLE2
 from qiling.os.uefi.st import EFI_SYSTEM_TABLE
@@ -49,12 +54,24 @@ class UefiContext(ABC):
         if guid in self.protocols[handle]:
             self.ql.log.warning(f'a protocol with guid {guid} is already installed')
 
-        if address is None:
-            struct_class = proto_desc['struct']
-            address = self.heap.alloc(struct_class.sizeof())
+        if 'struct' in proto_desc:
+            if address is None:
+                struct_class = proto_desc['struct']
+                address = self.heap.alloc(struct_class.sizeof())
 
-        instance = utils.init_struct(self.ql, address, proto_desc)
-        instance.saveTo(self.ql, address)
+            instance = utils.init_struct(self.ql, address, proto_desc)
+            instance.saveTo(self.ql, address)
+
+        # Nothing must be stored here, these kind of protocols should only add the pointer to the 
+        #   handle-guid-database and return it
+        elif 'pointer_name' in proto_desc:
+            if address is None:
+                address = proto_desc['address']
+
+            pointer_class = proto_desc['pointer_name']
+
+            self.ql.log.info(f'Initializing {pointer_class.__name__}')
+            self.ql.log.info(f" | {'->':36s} {hex(address)}")
 
         self.protocols[handle][guid] = address
         return self.notify_protocol(handle, guid, address, from_hook)
@@ -81,6 +98,8 @@ class DxeContext(UefiContext):
         super().__init__(ql)
 
         self.conftable = DxeConfTable(ql)
+        self.hii_context = HiiContext(ql)
+
 
 class SmmContext(UefiContext):
     def __init__(self, ql: Qiling):
@@ -176,6 +195,7 @@ class UefiConfTable:
         # not found
         return None
 
+
 class DxeConfTable(UefiConfTable):
     _struct_systbl = EFI_SYSTEM_TABLE
     _fname_arrptr = 'ConfigurationTable'
@@ -184,6 +204,76 @@ class DxeConfTable(UefiConfTable):
     @property
     def system_table(self) -> int:
         return self.ql.loader.gST
+
+
+class HiiContext:
+    def __init__(self, ql: Qiling) -> None:
+        self.ql = ql
+        self.guid_to_package_list_handle: dict[str, int] = {}  # {guid: package_list_handle, ...}
+        self.package_list_handle_to_device_handle: dict[int, int] = {}  # {package_list_handle: device_handle, ...}
+        self.package_lists: dict[int, list[Any]] = {}  # {package_list_handle: [package, package, ...], ...}
+        self.supported_languages: dict[int, Any]= defaultdict(set)  # {package_list_handle: }
+        self.next_handle: int = 0x10
+    
+    def add_string_package(self, package_list_handle, package_header_ptr):
+        string_package_header: EFI_HII_STRING_PACKAGE_HDR = EFI_HII_STRING_PACKAGE_HDR.loadFrom(self.ql, package_header_ptr)
+        language_ptr = package_header_ptr + string_package_header.offsetof('Language')
+        language = self.ql.os.utils.read_cstring(language_ptr)
+        self.ql.log.debug(f"Language: {language}")
+        self.supported_languages[package_list_handle] |= {language}
+
+    def add_device_path_package(self, package_list_handle, device_path):
+        # @see: MdeModulePkg\Universal\HiiDatabaseDxe\Database.c
+        # this adds a simple package like
+        # ---
+        # EFI_HII_PACKAGE_HEADER
+        # | Length
+        # | Type
+        # EFI_DEVICE_PATH_PROTOCOL
+        # ---
+        # Still requires device path protocol to be implemented, which is massive 
+        self.ql.log.warning(f"EFI_DEVICE_PATH_PROTOCOL is not implemented and will not be added to the package list")
+
+
+    # data is a complete packagelistheader, but we are too lazy to read the guid from the header here
+    def add_package_list(self, address: int, package_list_header: EFI_HII_PACKAGE_LIST_HEADER) -> int:
+        package_list_guid = UUID(bytes_le=bytes(package_list_header.PackageListGuid))
+
+        if package_list_guid in self.guid_to_package_list_handle:
+            package_list_handle = self.guid_to_package_list_handle[package_list_guid]
+        else:
+            package_list_handle = self.next_handle
+            self.guid_to_package_list_handle[package_list_guid] = package_list_handle
+            self.next_handle += 1
+
+        # first package header comes directly after package list header
+        package_header_ptr = address + EFI_HII_PACKAGE_LIST_HEADER.sizeof()
+
+        # TODO iterate over packages in list and add them (and extact their language)
+        while package_header_ptr < address + package_list_header.PackagLength:
+            package_header: EFI_HII_PACKAGE_HEADER = EFI_HII_PACKAGE_HEADER.loadFrom(self.ql, package_header_ptr)
+            package_length = (package_header.LengthHigh << 16) + package_header.LengthLow
+            package_type: int = package_header.Type
+
+            self.ql.log.debug(f"Length: {hex(package_length)}")
+            self.ql.log.debug(f"Type: {hex(package_type)}")
+
+            if package_type == EFI_HII_PACKAGE_STRINGS:
+                self.add_string_package(package_list_handle, package_header_ptr)
+            elif package_type == EFI_HII_PACKAGE_END:
+                pass
+            else:
+                self.qi.log.warning(f"Cannot handle package type {package_type}, skipping")
+
+            package_header_ptr += package_length
+
+        self.package_lists[package_list_handle] = package_list_guid
+
+        return package_list_handle
+
+    def get_package_list(self, handle):
+        return self.package_lists[handle]
+
 
 class SmmConfTable(UefiConfTable):
     _struct_systbl = EFI_SMM_SYSTEM_TABLE2

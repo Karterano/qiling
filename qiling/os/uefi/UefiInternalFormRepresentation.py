@@ -10,6 +10,11 @@ EFI_STRING_ID = UINT16
 
 EFI_HII_FONT_STYLE = UINT32
 
+
+EFI_HII_PACKAGE_STRINGS = 0x04
+EFI_HII_PACKAGE_END     = 0xDF
+
+
 class EFI_HII_PACKAGE_LIST_HEADER(STRUCT):
     _fields_ = [
         ('PackageListGuid',   EFI_GUID),
@@ -18,10 +23,24 @@ class EFI_HII_PACKAGE_LIST_HEADER(STRUCT):
 
 class EFI_HII_PACKAGE_HEADER(STRUCT):
     _fields_ = [
-        ('Length', UINT32),
-        ('Type', UINT32),
+        # Necessary as ctypes do not permit 24 bit fields
+        ('LengthLow', UINT16),  # UINT32  Length:24;
+        ('LengthHigh', UINT8),
+        ('Type', UINT8),        # UINT32  Type:8;
         # ('Data', PTR(UINT8))  # Array
     ]
+
+
+class EFI_HII_STRING_PACKAGE_HDR(STRUCT):
+    _fields_ = [
+        ('Header',              EFI_HII_PACKAGE_HEADER),
+        ('HdrSize',             UINT32),
+        ('StringInfoOffset',    UINT32),
+        ('LanguageWindow',      CHAR16 * 16),
+        ('LanguageName',        EFI_STRING_ID),
+        ('Language',            CHAR8 * 1)      # CHAR8 Language [... ];
+    ]
+
 
 class EFI_KEY(ENUM):
     _members_ = [

@@ -3,9 +3,12 @@
 # Cross Platform and Multi Architecture Advanced Binary Emulation Framework
 #
 
+from ctypes import sizeof
 from qiling import Qiling
 from qiling.os.const import *
+from qiling.os.uefi.utils import read_int64, write_int64
 from qiling.os.uefi.const import *
+from qiling.os.uefi.context import HiiContext
 from ..fncc import *
 from ..ProcessorBind import *
 from ..UefiBaseType import *
@@ -70,7 +73,39 @@ class EFI_HII_STRING_PROTOCOL(STRUCT):
         "LanguagesSize"     : POINTER,     # IN OUT PTR(UINTN)
     })
     def hook_GetLanguages(ql: Qiling, address: int, params):
-        pass
+        hii_context: HiiContext = ql.loader.context.hii_context
+        
+        package_list_handle = params['PackageList']
+        if package_list_handle not in hii_context.package_lists:
+            return EFI_NOT_FOUND
+        
+        supported_languages = hii_context.supported_languages[package_list_handle]
+        supported_languages_s = ''.join(s for s in supported_languages)
+        supported_languages_b = bytes(supported_languages_s, 'latin1') + b'\x00'
+
+        buffer = params["Languages"]
+        ql.log.debug(f"Languages: {hex(buffer)}")
+
+        if params['LanguagesSize'] == 0:
+            return EFI_INVALID_PARAMETER
+        
+        buffer_size = read_int64(ql, params['LanguagesSize'])
+        ql.log.debug(f"LanguagesSize: {hex(buffer_size)}")
+        
+        if buffer_size != 0 and buffer == 0:
+            return EFI_INVALID_PARAMETER
+        
+        # This also captures buffer_size == 0 and buffer == NULL to query the neccessary size
+        if len(supported_languages_b) > buffer_size:
+            write_int64(ql, params['LanguagesSize'], len(supported_languages_b))
+            return EFI_BUFFER_TOO_SMALL
+
+        ql.log.debug(f"Writing {len(supported_languages_b)} bytes to {hex(buffer)}")
+
+        ql.mem.write(buffer, supported_languages_b)
+        write_int64(ql, params['LanguagesSize'], len(supported_languages_b))
+        return EFI_SUCCESS
+
 
     @dxeapi(params = {
         "This"                      : POINTER,  # IN CONST PTR(CONST EFI_HII_STRING_PROTOCOL)

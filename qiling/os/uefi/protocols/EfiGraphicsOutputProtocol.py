@@ -7,8 +7,8 @@ from qiling import Qiling
 from qiling.os.const import *
 from qiling.os.uefi.const import *
 from ..fncc import *
-from ..ProcessorBind import *
-from ..UefiBaseType import *
+# from ..ProcessorBind import *
+# from ..UefiBaseType import *
 
 from qiling.os.uefi.UefiInternalFormRepresentation import *
 

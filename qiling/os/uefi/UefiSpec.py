@@ -197,7 +197,7 @@ EFI_SIMPLE_TEXT_INPUT_PROTOCOL = STRUCT
 
 # TODO: to be implemented
 # @see: MdePkg\Include\Protocol\SimpleTextOut.h
-EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL = STRUCT
+# EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL = STRUCT
 
 
 # __all__ = [

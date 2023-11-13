@@ -77,6 +77,9 @@ def HandleProtocol(context, params):
     protocol = params["Protocol"]
     interface = params['Interface']
 
+    if handle == 0 or protocol == 0 or interface == 0:
+        return EFI_INVALID_PARAMETER
+    
     if handle in context.protocols:
         supported = context.protocols[handle]
 

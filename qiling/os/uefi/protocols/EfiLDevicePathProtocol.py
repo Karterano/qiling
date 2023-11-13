@@ -11,6 +11,8 @@ from ..UefiBaseType import *
 #  This thing is only the shared header, there will be much more data depending on the type and subtype
 
 
+EFI_DEVICE_PATH_PROTOCOL_GUID = "09576e91-6d3f-11d2-8e39-00a0c969723b"
+
 class EFI_DEVICE_PATH_PROTOCOL(STRUCT):
     _fields_ = [
         ('Type',    UINT8),
@@ -21,7 +23,7 @@ class EFI_DEVICE_PATH_PROTOCOL(STRUCT):
 
 def make_descriptor(fields):
     return {
-        "guid": "050eb8C6-c12e-4b86-892b-40985e8b3137",
+        "guid": EFI_DEVICE_PATH_PROTOCOL_GUID,
         "struct": EFI_DEVICE_PATH_PROTOCOL,
         "fields": (
             ('Type',        0),
