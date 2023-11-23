@@ -215,6 +215,11 @@ class HiiContext:
         self.supported_languages: dict[int, Any]= defaultdict(set)  # {package_list_handle: }
         self.next_handle: int = 0x10
     
+    def add_form_package(self, package_list_handle, package_header_ptr):
+        form_package_header: EFI_HII_FORM_PACKAGE_HDR = EFI_HII_FORM_PACKAGE_HDR.loadFrom(self.ql, package_header_ptr)
+        # data seems to be in sub-headers again
+        self.ql.log.warning(f"Hii forms are not implemented and will not be added to the package list")
+
     def add_string_package(self, package_list_handle, package_header_ptr):
         string_package_header: EFI_HII_STRING_PACKAGE_HDR = EFI_HII_STRING_PACKAGE_HDR.loadFrom(self.ql, package_header_ptr)
         language_ptr = package_header_ptr + string_package_header.offsetof('Language')
@@ -258,12 +263,16 @@ class HiiContext:
             self.ql.log.debug(f"Length: {hex(package_length)}")
             self.ql.log.debug(f"Type: {hex(package_type)}")
 
-            if package_type == EFI_HII_PACKAGE_STRINGS:
+            if package_type == EFI_HII_PACKAGE_FORMS:
+                self.add_form_package(package_list_handle, package_header_ptr)
+            elif package_type == EFI_HII_PACKAGE_STRINGS:
                 self.add_string_package(package_list_handle, package_header_ptr)
+            elif package_type == EFI_HII_PACKAGE_DEVICE_PATH:
+                self.add_device_path_package(package_list_handle, None)
             elif package_type == EFI_HII_PACKAGE_END:
                 pass
             else:
-                self.qi.log.warning(f"Cannot handle package type {package_type}, skipping")
+                self.ql.log.warning(f"Cannot handle package type {package_type}, skipping")
 
             package_header_ptr += package_length
 

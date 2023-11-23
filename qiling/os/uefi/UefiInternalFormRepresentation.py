@@ -2,6 +2,7 @@ from .ProcessorBind import *
 from .UefiBaseType import *
 
 # @see: BaseTools/Source/C/Include/Common/UefiInternalFormRepresentation.h
+# @see: MdePkg/Include/Uefi/UefiInternalFormRepresentation.h
 EFI_HII_HANDLE = PTR(VOID)
 EFI_STRING = PTR(UINT16)
 EFI_IMAGE_ID = UINT16
@@ -10,9 +11,10 @@ EFI_STRING_ID = UINT16
 
 EFI_HII_FONT_STYLE = UINT32
 
-
-EFI_HII_PACKAGE_STRINGS = 0x04
-EFI_HII_PACKAGE_END     = 0xDF
+EFI_HII_PACKAGE_FORMS       = 0x02
+EFI_HII_PACKAGE_STRINGS     = 0x04
+EFI_HII_PACKAGE_DEVICE_PATH = 0x08
+EFI_HII_PACKAGE_END         = 0xDF
 
 
 class EFI_HII_PACKAGE_LIST_HEADER(STRUCT):
@@ -29,6 +31,24 @@ class EFI_HII_PACKAGE_HEADER(STRUCT):
         ('Type', UINT8),        # UINT32  Type:8;
         # ('Data', PTR(UINT8))  # Array
     ]
+
+
+class EFI_HII_DEVICE_PATH_PACKAGE(STRUCT):
+    _fields_ = [
+        ('Header',              EFI_HII_PACKAGE_HEADER)
+        # Again a massive spec, impossible to fully implement again
+        # // EFI_DEVICE_PATH_PROTOCOL DevicePath[];
+    ]
+
+
+class EFI_HII_FORM_PACKAGE_HDR(STRUCT):
+    _fields_ = [
+        ('Header',              EFI_HII_PACKAGE_HEADER)
+        # Again a massive spec, impossible to fully implement again
+        # // EFI_IFR_OP_HEADER         OpCodeHeader;
+        # // More op-codes follow
+    ]
+
 
 
 class EFI_HII_STRING_PACKAGE_HDR(STRUCT):

@@ -66,7 +66,7 @@ class EFI_HII_DATABASE_PROTOCOL(STRUCT):
         ql.mem.write_ptr(handle_ptr, handle)
 
         driver_handle = params['DriverHandle']
-        ql.log.debug(f"DriverHandle: {driver_handle}")
+        ql.log.debug(f"DriverHandle: {hex(driver_handle)}")
 
         if driver_handle != 0:
             # Associate driver_handle with new handle
