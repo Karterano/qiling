@@ -32,28 +32,21 @@ class EFI_SYSTEM_TABLE(STRUCT):
     ]
 
 
-def initialize(ql: Qiling, gST: int, gBS: int, gRT: int, cfg: int, out: int):
+def make_descriptor(fields):
     descriptor = {
         'struct' : EFI_SYSTEM_TABLE,
         'fields' : (
             ('Hdr',                     None),
             ('ConsoleInHandle',        1),
             ('ConsoleOutHandle',        1),
-            ('ConOut',                  out),
+            ('ConOut',                  fields['out']),
             ('StandardErrorHandle',     1),
-            ('StdErr',                  out),
-            ('RuntimeServices',         gRT),
-            ('BootServices',            gBS),
+            ('StdErr',                  fields['out']),
+            ('RuntimeServices',         fields['gRT']),
+            ('BootServices',            fields['gBS']),
             ('NumberOfTableEntries',    0),
-            ('ConfigurationTable',      cfg)
+            ('ConfigurationTable',      fields['cfg'])
         )
     }
 
-    ql.loader.gST = gST
-
-    instance = init_struct(ql, gST, descriptor)
-    instance.saveTo(ql, gST)
-
-__all__ = [
-    'initialize'
-]
+    return descriptor

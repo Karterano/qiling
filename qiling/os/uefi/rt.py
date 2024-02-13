@@ -229,8 +229,7 @@ class EFI_RUNTIME_SERVICES(STRUCT):
     def hook_QueryVariableInfo(ql: Qiling, address: int, params):
         return EFI_SUCCESS
 
-def initialize(ql: Qiling, gRT: int):
-    descriptor = {
+descriptor = {
         'struct' : EFI_RUNTIME_SERVICES,
         'fields' : (
             ('Hdr',                            None),
@@ -250,6 +249,3 @@ def initialize(ql: Qiling, gRT: int):
             ('QueryVariableInfo',            EFI_RUNTIME_SERVICES.hook_QueryVariableInfo)
         )
     }
-
-    instance = init_struct(ql, gRT, descriptor)
-    instance.saveTo(ql, gRT)

@@ -248,8 +248,7 @@ class EFI_DXE_SERVICES(STRUCT):
     def hook_SetMemorySpaceCapabilities(ctx, address, params):
         return EFI_UNSUPPORTED
 
-def initialize(ql: Qiling, gDS: int):
-    descriptor = {
+descriptor = {
         'struct' : EFI_DXE_SERVICES,
         'fields' : (
             ('Hdr',                            None),
@@ -273,11 +272,3 @@ def initialize(ql: Qiling, gDS: int):
             ('SetMemorySpaceCapabilities',    EFI_DXE_SERVICES.hook_SetMemorySpaceCapabilities)
         )
     }
-
-    instance = init_struct(ql, gDS, descriptor)
-    instance.saveTo(ql, gDS)
-
-__all__ = [
-    'EFI_DXE_SERVICES',
-    'initialize'
-]

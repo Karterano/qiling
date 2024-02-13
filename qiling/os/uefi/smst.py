@@ -236,7 +236,8 @@ def initialize(ql: Qiling, context, gSmst: int):
     gSmmRT = gSmst + EFI_SMM_SYSTEM_TABLE2.sizeof()    # smm runtime services
     cfg = gSmmRT + rt.EFI_RUNTIME_SERVICES.sizeof()    # configuration tables array
 
-    rt.initialize(ql, gSmmRT)
+    instance = init_struct(ql, gSmmRT, rt.descriptor)
+    instance.saveTo(ql, gSmmRT)
 
     descriptor = {
         'struct' : EFI_SMM_SYSTEM_TABLE2,

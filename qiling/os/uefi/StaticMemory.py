@@ -68,13 +68,21 @@ def initialize(ql: Qiling, context: UefiContext, base: int):
     ql.log.info(f' | gDS   {gDS:#010x}')
     ql.log.info(f'')
 
-    bs.initialize(ql, gBS)
-    rt.initialize(ql, gRT)
-    ds.initialize(ql, gDS)
+    ql.os.monotonic_count = 0
+    instance = init_struct(ql, gBS, bs.descriptor)
+    instance.saveTo(ql, gBS)
+
+    instance = init_struct(ql, gRT, rt.descriptor)
+    instance.saveTo(ql, gRT)
+
+    instance = init_struct(ql, gDS, ds.descriptor)
+    instance.saveTo(ql, gDS)
 
     context.install_protocol(EfiSimpleTextOutputProtocol.descriptor, 1, out)
 
-    st.initialize(ql, gST, gBS, gRT, cfg, out)
+    ql.loader.gST = gST
+    instance = init_struct(ql, gST, st.make_descriptor({'gBS': gBS, 'gRT': gRT, 'cfg': cfg, 'out': out}))
+    instance.saveTo(ql, gST)
 
     install_configuration_table(context, "HOB_LIST", None)
     install_configuration_table(context, "DXE_SERVICE_TABLE", gDS)
