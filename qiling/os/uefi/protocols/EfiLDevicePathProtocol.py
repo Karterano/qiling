@@ -21,8 +21,7 @@ class EFI_DEVICE_PATH_PROTOCOL(STRUCT):
     ]
 
 
-def make_descriptor(fields):
-    return {
+descriptor = {
         "guid": EFI_DEVICE_PATH_PROTOCOL_GUID,
         "struct": EFI_DEVICE_PATH_PROTOCOL,
         "fields": (

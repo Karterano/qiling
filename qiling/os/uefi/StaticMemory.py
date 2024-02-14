@@ -12,6 +12,11 @@ from qiling.os.uefi.protocols import EfiSimpleTextOutputProtocol
 # from .UefiBaseType import *
 # from .UefiMultiPhase import *
 
+OUT_HANDLE = 1
+MM_HANDLE = 2
+FV_HANDLE = 3
+HII_HANDLE = 4
+
 
 # static mem layout:
 #
@@ -53,13 +58,13 @@ from qiling.os.uefi.protocols import EfiSimpleTextOutputProtocol
 #        +-----------------------------+
 
 
-def initialize(ql: Qiling, context: UefiContext, base: int):
+def initialize(ql: Qiling, context: UefiContext, base: int, text_out_protocol: int = 0):
     gST = base
     gBS = gST + st.EFI_SYSTEM_TABLE.sizeof()        # boot services
     gRT = gBS + bs.EFI_BOOT_SERVICES.sizeof()        # runtime services
     gDS = gRT + rt.EFI_RUNTIME_SERVICES.sizeof()    # dxe services
     cfg = gDS + ds.EFI_DXE_SERVICES.sizeof()    # configuration tables array
-    out = cfg + EfiSimpleTextOutputProtocol.EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.sizeof()
+    out = text_out_protocol
 
     ql.log.info(f'Global tables:')
     ql.log.info(f' | gST   {gST:#010x}')
@@ -78,15 +83,9 @@ def initialize(ql: Qiling, context: UefiContext, base: int):
     instance = init_struct(ql, gDS, ds.descriptor)
     instance.saveTo(ql, gDS)
 
-    context.install_protocol(EfiSimpleTextOutputProtocol.descriptor, 1, out)
-
     ql.loader.gST = gST
     instance = init_struct(ql, gST, st.make_descriptor({'gBS': gBS, 'gRT': gRT, 'cfg': cfg, 'out': out}))
     instance.saveTo(ql, gST)
 
     install_configuration_table(context, "HOB_LIST", None)
     install_configuration_table(context, "DXE_SERVICE_TABLE", gDS)
-
-__all__ = [
-    'initialize'
-]

@@ -4,7 +4,7 @@
 #
 
 from qiling import Qiling
-from qiling.os.uefi import bs, rt
+from qiling.os.uefi import StaticMemory, bs, rt
 from qiling.os.uefi.utils import init_struct
 from .ProcessorBind import *
 from .UefiBaseType import *
@@ -37,10 +37,10 @@ def make_descriptor(fields):
         'struct' : EFI_SYSTEM_TABLE,
         'fields' : (
             ('Hdr',                     None),
-            ('ConsoleInHandle',        1),
-            ('ConsoleOutHandle',        1),
+            ('ConsoleInHandle',         0),
+            ('ConsoleOutHandle',        StaticMemory.OUT_HANDLE),
             ('ConOut',                  fields['out']),
-            ('StandardErrorHandle',     1),
+            ('StandardErrorHandle',     StaticMemory.OUT_HANDLE),
             ('StdErr',                  fields['out']),
             ('RuntimeServices',         fields['gRT']),
             ('BootServices',            fields['gBS']),

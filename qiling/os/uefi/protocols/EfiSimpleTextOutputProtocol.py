@@ -24,6 +24,8 @@ class EFI_SIMPLE_TEXT_OUTPUT_MODE(STRUCT):
     ]
 
 
+EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID = "387477c2-69c7-11d2-8e39-00a0c969723b"
+
 # @see: MdePkg\Include\Protocol\SimpleTextOut.h
 class EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL(STRUCT):
     EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL = STRUCT
@@ -109,7 +111,7 @@ class EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL(STRUCT):
         pass
 
 descriptor = {
-    "guid" : "387477c2-69c7-11d2-8e39-00a0c969723b",
+    "guid" : EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID,
     "struct" : EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL,
     "fields" : (
         ("Reset",               EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.hook_Reset),

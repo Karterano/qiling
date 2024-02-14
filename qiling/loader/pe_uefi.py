@@ -29,6 +29,7 @@ from qiling.os.uefi.protocols import EfiHiiConfigRoutingProtocol
 from qiling.os.uefi.protocols import EfiHiiFontProtocol
 from qiling.os.uefi.protocols import EfiHiiImageProtocol
 from qiling.os.uefi.protocols import EfiGraphicsOutputProtocol
+from qiling.os.uefi.protocols import EfiSimpleTextOutputProtocol
 from qiling.os.uefi.protocols import EfiHiiPackageListProtocol
 from qiling.os.uefi.protocols import EfiLDevicePathProtocol
 
@@ -74,12 +75,13 @@ class QlLoaderPE_UEFI(QlLoader):
 
         self.ql.os.heap.restore(saved_state['heap'])
 
-    def install_loaded_image_protocol(self, image_base: int, image_size: int, device_path_handle: int):
+    def install_loaded_image_protocol(self, image_base: int, image_size: int, device_path_handle: int, file_path: int):
         fields = {
             'gST'        : self.gST,
             'image_base' : image_base,
             'image_size' : image_size,
-            'device_path': device_path_handle
+            'device_handle': device_path_handle,
+            'file_path': file_path
         }
 
         descriptor = EfiLoadedImageProtocol.make_descriptor(fields)
@@ -171,22 +173,23 @@ class QlLoaderPE_UEFI(QlLoader):
         if self.entry_point == 0:
             self.entry_point = entry_point
 
-        # TODO the next four protocols are installed on a handle once it is loaded, 
+        # TODO the next 3 protocols are installed on a handle once it is loaded, 
         #  but this is defined only if they are loaded by the BootServices->LoadImage() function.
         #  at least this functionality should also be supported in Qilings LoadImage() function (just a stub currently)
         # TODO also investitage whether this behaviour would also apply if it is loaded by DxeCore,
-        #  or if that also interally must use the LoadImage() boot service, then instead transfer it into the service
+        #  or if that also internally must use the LoadImage() boot service, then instead transfer it into the service
         #  and use it here.
         # TODO since it is either the boot service functions or DxeCores responsibility to install these protocols
         #  on the module handle, can also factor it out into a util function, like "check_and_install_protocols()" or smth
-        self.install_loaded_image_protocol(image_base, image_size, device_path_handle=1)
+        
+        device_path_protocol = self.context.protocols[StaticMemory.FV_HANDLE][EfiLDevicePathProtocol.EFI_DEVICE_PATH_PROTOCOL_GUID]
+        self.install_loaded_image_protocol(image_base, image_size, device_path_handle=StaticMemory.FV_HANDLE, file_path=device_path_protocol)
 
-        # TODO use a "shared device handle" (since all images will come from the same "device")
-        #  install the device path protocol first, then use it in the loaded image protocol
-        #  and also use it here
+        # TODO Should point to a copy of the DEVICE_PATH_PROTOCOL that was used as an argument to BootServices->LoadImage(),
+        #  must be installed onto an image handle, but the argument was optional, so simpy storing a null pointer in the handle 
+        #  database would be allowed
+        #  -> Since we do not have any senseful DEVICE_PATH_PROTOCOLS anyway, we simply install the same minimal stub as always 
         self.install_loaded_image_device_path_protocol(image_base)
-
-        self.context.install_protocol(EfiFirmwareVolume2Protocol.descriptor, image_base)
 
         if hasattr(pe, 'DIRECTORY_ENTRY_RESOURCE'):
             resource_dir_data: ResourceDirData = pe.DIRECTORY_ENTRY_RESOURCE
@@ -330,26 +333,38 @@ class QlLoaderPE_UEFI(QlLoader):
         # executed, like the system table location
         context.end_of_execution_ptr = gST
 
-        StaticMemory.initialize(ql, context, gST)
+        out_protocols = (
+            EfiGraphicsOutputProtocol,
+            EfiSimpleTextOutputProtocol
+        )
+        for p in out_protocols:
+            context.install_protocol(p.descriptor, StaticMemory.OUT_HANDLE)
 
-        protocols = (
+        StaticMemory.initialize(ql, context, gST, context.protocols[StaticMemory.OUT_HANDLE][EfiSimpleTextOutputProtocol.EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID])
+
+        mm_protocols = (
             EfiSmmAccess2Protocol,
             EfiSmmBase2Protocol,
+        )
+        for p in mm_protocols:
+            context.install_protocol(p.descriptor, StaticMemory.MM_HANDLE)
+
+        fv_protocols = (
+            EfiLDevicePathProtocol,
+            EfiFirmwareVolume2Protocol
+        )
+        for p in fv_protocols:
+            context.install_protocol(p.descriptor, StaticMemory.FV_HANDLE)
+
+        hii_protocols = (
             EfiHiiStringProtocol,
             EfiHiiDatabaseProtocol, 
             EfiHiiConfigRoutingProtocol,
             EfiHiiFontProtocol,
             EfiHiiImageProtocol,
-            EfiGraphicsOutputProtocol
         )
-
-        for p in protocols:
-            context.install_protocol(p.descriptor, 1)
-
-        # TODO this installs a single device path protocol on the "global" handle that will be 
-        #   referred to in all per-image loaded image protocols
-        #   It is also completely empty and invalid
-        context.install_protocol(EfiLDevicePathProtocol.make_descriptor({}), 1)
+        for p in hii_protocols:
+            context.install_protocol(p.descriptor, StaticMemory.HII_HANDLE)
 
         return context
 
@@ -396,13 +411,20 @@ class QlLoaderPE_UEFI(QlLoader):
 
         smst.initialize(ql, context, gSmst)
 
-        protocols = (
+        mm_protocols = (
             EfiSmmCpuProtocol,
             EfiSmmSwDispatch2Protocol
         )
 
-        for p in protocols:
-            context.install_protocol(p.descriptor, 1)
+        for p in mm_protocols:
+            context.install_protocol(p.descriptor, StaticMemory.MM_HANDLE)
+
+        fv_protocols = (
+            EfiLDevicePathProtocol,
+            EfiFirmwareVolume2Protocol
+        )
+        for p in fv_protocols:
+            context.install_protocol(p.descriptor, StaticMemory.FV_HANDLE)
 
         return context
 

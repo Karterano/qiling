@@ -166,6 +166,11 @@ class UefiConfTable:
         instance.VendorTable = table
         instance.saveTo(self.ql, ptr)
 
+        self.ql.log.info(f'Initializing {EFI_CONFIGURATION_TABLE.__name__}')
+        self.ql.log.info(f' | {"VendorGuid":36s} {guid}')
+        self.ql.log.info(f' | {"VendorTable":36s} {table:#010x}')
+        self.ql.log.info(f'')
+
         if append:
             self.nitems += 1
 

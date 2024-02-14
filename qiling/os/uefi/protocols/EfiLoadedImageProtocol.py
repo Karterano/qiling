@@ -38,8 +38,8 @@ def make_descriptor(fields):
             ('Revision',        0x1000),
             ('ParentHandle',    0),
             ('SystemTable',        fields['gST']),
-            ('DeviceHandle',    fields['image_base']),
-            ('FilePath',        fields['device_path']),        # This is a handle to a complex path object, skip it for now.
+            ('DeviceHandle',    fields['device_handle']),
+            ('FilePath',        fields['file_path']),        # This is a handle to a complex path object, skip it for now.
             ('LoadOptionsSize',    0),
             ('LoadOptions',        0),
             ('ImageBase',        fields['image_base']),
