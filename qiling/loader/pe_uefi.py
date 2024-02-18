@@ -4,6 +4,7 @@
 #
 
 from ctypes import sizeof
+import os
 from pefile import PE, DIRECTORY_ENTRY, ResourceDirData, ResourceDirEntryData, ResourceDataEntryData
 from typing import Any, Mapping, Optional, Sequence
 
@@ -34,6 +35,13 @@ from qiling.os.uefi.protocols import EfiHiiPackageListProtocol
 from qiling.os.uefi.protocols import EfiLDevicePathProtocol
 
 
+def _read_filetypes(rootfs: str, filetype_path: str) -> dict[str, str]:
+    filetypes: dict[str, str] = {}
+    with open(filetype_path) as f:
+            for line in f:
+                file, filetype = line.strip().split(':')
+                filetypes[os.path.join(rootfs, file)] = filetype
+    return filetypes
 
 class QlLoaderPE_UEFI(QlLoader):
     def __init__(self, ql: Qiling):
@@ -335,7 +343,8 @@ class QlLoaderPE_UEFI(QlLoader):
 
         out_protocols = (
             EfiGraphicsOutputProtocol,
-            EfiSimpleTextOutputProtocol
+            EfiSimpleTextOutputProtocol,
+            EfiLDevicePathProtocol
         )
         for p in out_protocols:
             context.install_protocol(p.descriptor, StaticMemory.OUT_HANDLE)
@@ -449,11 +458,15 @@ class QlLoaderPE_UEFI(QlLoader):
         self.entry_point = 0
         self.load_address = 0
 
+        filetypes_path = ql.os.profile.get('FILETYPES', option='file', fallback=None)
+        filetypes = _read_filetypes(ql.rootfs, os.path.join(ql.rootfs, filetypes_path))
+
         try:
             for dependency in ql.argv:
 
                 # TODO: determine whether this is an smm or dxe module
-                is_smm_module = 'Smm' in dependency
+                #   hacky way that relies on a file that we parsed produced containg the type for each of our modules
+                is_smm_module = filetypes[dependency[:-3]] == "1SMM"
 
                 if is_smm_module:
                     self.context = self.smm_context

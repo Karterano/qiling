@@ -33,3 +33,6 @@ Guid = 5b1b31a1-9562-11d2-8e3f-00a0c969723b
 
 [MISC]
 current_path = /
+
+[FILETYPES]
+file = filetypes.txt
