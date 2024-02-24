@@ -22,6 +22,7 @@ from qiling.os.uefi.protocols import EfiSmmAccess2Protocol
 from qiling.os.uefi.protocols import EfiSmmBase2Protocol
 from qiling.os.uefi.protocols import EfiSmmCpuProtocol
 from qiling.os.uefi.protocols import EfiSmmSwDispatch2Protocol
+from qiling.os.uefi.protocols import EfiSmmFirmwareVolumeProtocol
 from qiling.os.uefi.protocols import PcdProtocol
 from qiling.os.uefi.protocols import EfiFirmwareVolume2Protocol
 from qiling.os.uefi.protocols import EfiHiiStringProtocol
@@ -136,7 +137,7 @@ class QlLoaderPE_UEFI(QlLoader):
         self.context.install_protocol(descriptor, image_base)
         
 
-    def map_and_load(self, path: str, context: UefiContext, exec_now: bool=False):
+    def map_and_load(self, path: str, context: UefiContext, environment: str, exec_now: bool=False, ):
         """Map and load a module into memory.
 
         The specified module would be mapped and loaded into the address set
@@ -172,6 +173,7 @@ class QlLoaderPE_UEFI(QlLoader):
         ql.mem.map(image_base, image_size, info="[module]")
         ql.mem.write(image_base, data)
         ql.log.info(f'Module {path} loaded to {image_base:#x}')
+        ql.log.info(f"Using environment {environment}")
 
         entry_point = image_base + pe.OPTIONAL_HEADER.AddressOfEntryPoint
         ql.log.info(f'Module entry point at {entry_point:#x}')
@@ -275,6 +277,8 @@ class QlLoaderPE_UEFI(QlLoader):
 
         # use familiar UEFI names
         ImageHandle = image_base
+        # TODO this means that MM traditional is used. 
+        #  Could distinguish to MM standalone and use self.gSmst there
         SystemTable = self.gST
 
         # set effectively active heap
@@ -351,6 +355,7 @@ class QlLoaderPE_UEFI(QlLoader):
 
         StaticMemory.initialize(ql, context, gST, context.protocols[StaticMemory.OUT_HANDLE][EfiSimpleTextOutputProtocol.EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID])
 
+        # TODO missing EFI_MM_COMMUNICATION_PROTOCOL to be complete, see UEFI PI IV-5.1 and 1.4.3 / 1.5.1 / 1.5.2
         mm_protocols = (
             EfiSmmAccess2Protocol,
             EfiSmmBase2Protocol,
@@ -430,7 +435,7 @@ class QlLoaderPE_UEFI(QlLoader):
 
         fv_protocols = (
             EfiLDevicePathProtocol,
-            EfiFirmwareVolume2Protocol
+            EfiSmmFirmwareVolumeProtocol
         )
         for p in fv_protocols:
             context.install_protocol(p.descriptor, StaticMemory.FV_HANDLE)
@@ -464,16 +469,21 @@ class QlLoaderPE_UEFI(QlLoader):
         try:
             for dependency in ql.argv:
 
-                # TODO: determine whether this is an smm or dxe module
-                #   hacky way that relies on a file that we parsed produced containg the type for each of our modules
-                is_smm_module = filetypes[dependency[:-3]] == "1SMM"
+                # hacky way that relies on a file that we parsed produced containg the type for each of our modules
+                is_traditional_smm_module = filetypes[dependency[:-3]] == "4SMM"
+                is_standalone_smm_module = filetypes[dependency[:-3]] == "5SMM"
 
-                if is_smm_module:
+                if is_standalone_smm_module:
                     self.context = self.smm_context
+                    environment = "MM Traditional (~ DXE) (Module is MM Standalone)"
+                elif is_traditional_smm_module:
+                    self.context = self.smm_context
+                    environment = "MM Traditional (~ DXE)"
                 else:
+                    environment = "DXE"
                     self.context = self.dxe_context
 
-                self.map_and_load(dependency, self.context)
+                self.map_and_load(dependency, self.context, environment)
 
             ql.log.info(f"Done loading modules")
 
