@@ -10,7 +10,7 @@ from typing import Any, Mapping, Optional, Sequence
 
 from qiling import Qiling
 from qiling.const import QL_ARCH
-from qiling.exception import QlErrorArch, QlMemoryMappedError
+from qiling.exception import QlErrorArch, QlMemoryMappedError, QlErrorNotImplemented
 from qiling.loader.loader import QlLoader, Image
 from qiling.os.const import PARAM_INTN, POINTER
 
@@ -137,7 +137,7 @@ class QlLoaderPE_UEFI(QlLoader):
         self.context.install_protocol(descriptor, image_base)
         
 
-    def map_and_load(self, path: str, context: UefiContext, environment: str, exec_now: bool=False, ):
+    def map_and_load(self, path: str, context: UefiContext, mm_standalone: bool, exec_now: bool=False):
         """Map and load a module into memory.
 
         The specified module would be mapped and loaded into the address set
@@ -173,7 +173,6 @@ class QlLoaderPE_UEFI(QlLoader):
         ql.mem.map(image_base, image_size, info="[module]")
         ql.mem.write(image_base, data)
         ql.log.info(f'Module {path} loaded to {image_base:#x}')
-        ql.log.info(f"Using environment {environment}")
 
         entry_point = image_base + pe.OPTIONAL_HEADER.AddressOfEntryPoint
         ql.log.info(f'Module entry point at {entry_point:#x}')
@@ -216,7 +215,8 @@ class QlLoaderPE_UEFI(QlLoader):
         # is unknown though
         context.next_image_base = image_base + image_size
 
-        module_info = (path, image_base, entry_point, context)
+        # TODO remember a traditional mode flag
+        module_info = (path, image_base, entry_point, context, mm_standalone)
 
         # execute the module right away or enqueue it
         if exec_now:
@@ -265,7 +265,7 @@ class QlLoaderPE_UEFI(QlLoader):
 
         return False
 
-    def execute_module(self, path: str, image_base: int, entry_point: int, context: UefiContext, eoe_trap: Optional[int]):
+    def execute_module(self, path: str, image_base: int, entry_point: int, context: UefiContext, mm_standalone: bool, eoe_trap: Optional[int]):
         """Start the execution of a UEFI module.
 
         Args:
@@ -277,9 +277,19 @@ class QlLoaderPE_UEFI(QlLoader):
 
         # use familiar UEFI names
         ImageHandle = image_base
-        # TODO this means that MM traditional is used. 
-        #  Could distinguish to MM standalone and use self.gSmst there
-        SystemTable = self.gST
+
+        if isinstance(context, DxeContext):
+            self.ql.log.info(f"Using DXE context")
+            SystemTable = self.gST
+        elif isinstance(context, SmmContext):
+            if mm_standalone:
+                self.ql.log.info(f"Using MM context (MM Standalone)")
+                SystemTable = self.gSmst
+            else:
+                self.ql.log.info(f"Using DXE context (MM Traditional)")
+                SystemTable = self.gST
+        else:
+            raise QlErrorNotImplemented(f"Module {path} cannot be run in context {context.__class__}")
 
         # set effectively active heap
         self.ql.os.heap = context.heap
@@ -301,12 +311,12 @@ class QlLoaderPE_UEFI(QlLoader):
         if not self.modules:
             return
 
-        path, image_base, entry_point, context = self.modules.pop(0)
+        path, image_base, entry_point, context, mm_standalone = self.modules.pop(0)
 
         if self.ql.os.notify_before_module_execution(path):
             return
 
-        self.execute_module(path, image_base, entry_point, context, context.end_of_execution_ptr)
+        self.execute_module(path, image_base, entry_point, context, mm_standalone, context.end_of_execution_ptr)
 
     def __init_dxe_environment(self, ql: Qiling) -> DxeContext:
         """Initialize DXE data structures (BS, RT and DS) and install essential protocols.
@@ -473,17 +483,12 @@ class QlLoaderPE_UEFI(QlLoader):
                 is_traditional_smm_module = filetypes[dependency[:-3]] == "4SMM"
                 is_standalone_smm_module = filetypes[dependency[:-3]] == "5SMM"
 
-                if is_standalone_smm_module:
+                if is_traditional_smm_module or is_standalone_smm_module:
                     self.context = self.smm_context
-                    environment = "MM Traditional (~ DXE) (Module is MM Standalone)"
-                elif is_traditional_smm_module:
-                    self.context = self.smm_context
-                    environment = "MM Traditional (~ DXE)"
                 else:
-                    environment = "DXE"
                     self.context = self.dxe_context
 
-                self.map_and_load(dependency, self.context, environment)
+                self.map_and_load(dependency, self.context, is_standalone_smm_module)
 
             ql.log.info(f"Done loading modules")
 
