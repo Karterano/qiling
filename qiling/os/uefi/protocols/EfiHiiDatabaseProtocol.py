@@ -58,7 +58,7 @@ class EFI_HII_DATABASE_PROTOCOL(STRUCT):
         package_list_header = EFI_HII_PACKAGE_LIST_HEADER.loadFrom(ql, package_list_ptr)
         package_list_guid = UUID(bytes_le=bytes(package_list_header.PackageListGuid))
         ql.log.debug(f"PackageListGuid: {package_list_guid}")
-        ql.log.debug(f"PackagLength: {hex(package_list_header.PackagLength)}")
+        ql.log.debug(f"PackageLength: {hex(package_list_header.PackagLength)}")
 
         hii_context: HiiContext = ql.loader.context.hii_context
         handle = hii_context.add_package_list(package_list_ptr, package_list_header)
